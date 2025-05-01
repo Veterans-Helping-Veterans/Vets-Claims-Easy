@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Firebase Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            min-height: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simple Firebase Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Console Log Test</h2>
+        <p>This tests if JavaScript is working properly.</p>
+        <button id="consoleTestBtn">Run Console Test</button>
+        <div id="consoleResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Firebase Import Test</h2>
+        <p>This tests if Firebase modules can be imported.</p>
+        <button id="importTestBtn">Test Firebase Import</button>
+        <div id="importResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Firebase Config Test</h2>
+        <p>This tests if Firebase configuration is valid.</p>
+        <button id="configTestBtn">Test Firebase Config</button>
+        <div id="configResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Firebase Database Test</h2>
+        <p>This tests if Firebase Realtime Database is working.</p>
+        <button id="dbTestBtn">Test Database</button>
+        <div id="dbResult" class="result"></div>
+    </div>
+    
+    <script>
+        // Console Test
+        document.getElementById('consoleTestBtn').addEventListener('click', function() {
+            const resultElement = document.getElementById('consoleResult');
+            try {
+                console.log('Console test successful at ' + new Date().toISOString());
+                resultElement.innerHTML = '<span class="success">Console test successful! Check browser console (F12) for details.</span>';
+            } catch (error) {
+                resultElement.innerHTML = '<span class="error">Console test failed: ' + error.message + '</span>';
+            }
+        });
+        
+        // Import Test - Using a separate script to avoid blocking
+        document.getElementById('importTestBtn').addEventListener('click', function() {
+            const resultElement = document.getElementById('importResult');
+            resultElement.innerHTML = 'Testing Firebase import...';
+            
+            // Create a script element to test the import
+            const script = document.createElement('script');
+            script.type = 'module';
+            script.textContent = `
+                try {
+                    import('./js/firebase-config.js')
+                        .then(module => {
+                            document.getElementById('importResult').innerHTML = 
+                                '<span class="success">Firebase modules imported successfully!</span>';
+                        })
+                        .catch(error => {
+                            document.getElementById('importResult').innerHTML = 
+                                '<span class="error">Firebase import failed: ' + error.message + '</span><pre>' + error.stack + '</pre>';
+                        });
+                } catch (error) {
+                    document.getElementById('importResult').innerHTML = 
+                        '<span class="error">Firebase import failed: ' + error.message + '</span><pre>' + error.stack + '</pre>';
+                }
+            `;
+            document.body.appendChild(script);
+        });
+        
+        // Config Test
+        document.getElementById('configTestBtn').addEventListener('click', function() {
+            const resultElement = document.getElementById('configResult');
+            resultElement.innerHTML = 'Testing Firebase configuration...';
+            
+            const script = document.createElement('script');
+            script.type = 'module';
+            script.textContent = `
+                import { app } from './js/firebase-config.js';
+                try {
+                    if (app && app.options) {
+                        const config = {
+                            projectId: app.options.projectId,
+                            authDomain: app.options.authDomain,
+                            databaseURL: app.options.databaseURL,
+                            storageBucket: app.options.storageBucket
+                        };
+                        
+                        document.getElementById('configResult').innerHTML = 
+                            '<span class="success">Firebase configuration is valid!</span>' +
+                            '<pre>' + JSON.stringify(config, null, 2) + '</pre>';
+                    } else {
+                        document.getElementById('configResult').innerHTML = 
+                            '<span class="error">Firebase app is not properly initialized</span>';
+                    }
+                } catch (error) {
+                    document.getElementById('configResult').innerHTML = 
+                        '<span class="error">Firebase config test failed: ' + error.message + '</span><pre>' + error.stack + '</pre>';
+                }
+            `;
+            document.body.appendChild(script);
+        });
+        
+        // Database Test
+        document.getElementById('dbTestBtn').addEventListener('click', function() {
+            const resultElement = document.getElementById('dbResult');
+            resultElement.innerHTML = 'Testing Firebase database...';
+            
+            const script = document.createElement('script');
+            script.type = 'module';
+            script.textContent = `
+                import { database, ref, set, get, child } from './js/firebase-config.js';
+                
+                try {
+                    // Create a test reference
+                    const testRef = ref(database, 'test');
+                    const testData = {
+                        timestamp: new Date().toISOString(),
+                        message: 'Simple Firebase test'
+                    };
+                    
+                    // Write data
+                    set(testRef, testData)
+                        .then(() => {
+                            // Read data back
+                            return get(child(ref(database), 'test'));
+                        })
+                        .then((snapshot) => {
+                            if (snapshot.exists()) {
+                                document.getElementById('dbResult').innerHTML = 
+                                    '<span class="success">Database test successful!</span>' +
+                                    '<pre>' + JSON.stringify(snapshot.val(), null, 2) + '</pre>';
+                            } else {
+                                document.getElementById('dbResult').innerHTML = 
+                                    '<span class="error">No data found in database</span>';
+                            }
+                        })
+                        .catch(error => {
+                            document.getElementById('dbResult').innerHTML = 
+                                '<span class="error">Database test failed: ' + error.message + '</span><pre>' + error.stack + '</pre>';
+                        });
+                } catch (error) {
+                    document.getElementById('dbResult').innerHTML = 
+                        '<span class="error">Database test failed: ' + error.message + '</span><pre>' + error.stack + '</pre>';
+                }
+            `;
+            document.body.appendChild(script);
+        });
+    </script>
+</body>
+</html>
