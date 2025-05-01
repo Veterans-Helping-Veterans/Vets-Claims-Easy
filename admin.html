@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; connect-src 'self';">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta name="referrer" content="no-referrer">
+    <meta name="description" content="Secure admin dashboard for veterans claims assistance portal">
+    <title>Admin Dashboard - Veterans VA Claims Assistance Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/security.js"></script>
+    <!-- Firebase Scripts -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/admin-auth.js"></script>
+</head>
+<body class="bg-gray-100">
+    <div id="loginContainer" class="min-h-screen flex items-center justify-center">
+        <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+            <div class="text-center mb-6">
+                <img src="images/military-pattern.svg" alt="Military Pattern" class="w-16 h-16 mx-auto mb-2 rounded-full">
+                <h2 class="text-2xl font-bold text-center" style="color: var(--military-green);">Admin Login</h2>
+                <p class="text-gray-600">Enter your credentials to access the admin dashboard</p>
+            </div>
+
+            <div id="loginError" class="hidden bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4">
+                <p>Invalid credentials. Please try again.</p>
+            </div>
+
+            <form id="loginForm" class="space-y-4">
+                <div>
+                    <label for="adminEmail" class="block text-gray-700 font-medium mb-2">Email Address</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-envelope text-gray-400"></i>
+                        </div>
+                        <input type="email" id="adminEmail" name="adminEmail" required
+                            class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
+                            style="focus:ring-color: var(--military-green);">
+                    </div>
+                </div>
+                <div>
+                    <label for="adminPassword" class="block text-gray-700 font-medium mb-2">Password</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-lock text-gray-400"></i>
+                        </div>
+                        <input type="password" id="adminPassword" name="adminPassword" required
+                            class="w-full pl-10 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2"
+                            style="focus:ring-color: var(--military-green);">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                            <button type="button" id="togglePassword" class="text-gray-400 hover:text-gray-600">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex justify-center">
+                    <button type="submit" class="admin-btn admin-btn-primary w-full py-2">
+                        <i class="fas fa-sign-in-alt mr-2"></i> Login
+                    </button>
+                </div>
+
+                <div class="mt-4 text-sm text-gray-600 bg-gray-100 p-3 rounded">
+                    <p class="font-medium">Demo Credentials:</p>
+                    <p>Email: admin@example.com</p>
+                    <p>Password: admin123</p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="adminDashboard" class="hidden admin-container">
+        <!-- Admin Sidebar -->
+        <div class="admin-sidebar">
+            <div class="admin-sidebar-header">
+                <h2 class="text-xl font-bold">Admin Portal</h2>
+                <p class="text-sm text-gray-400">Veterans Claims Assistance</p>
+            </div>
+
+            <ul class="admin-sidebar-menu">
+                <li>
+                    <a href="#dashboard" class="active" data-section="dashboardSection">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="#claims" data-section="claimsSection">
+                        <i class="fas fa-file-alt"></i> Claims
+                    </a>
+                </li>
+                <li>
+                    <a href="#analytics" data-section="analyticsSection">
+                        <i class="fas fa-chart-bar"></i> Analytics
+                    </a>
+                </li>
+                <li>
+                    <a href="#settings" data-section="settingsSection">
+                        <i class="fas fa-cog"></i> Settings
+                    </a>
+                </li>
+                <li class="mt-auto">
+                    <a href="#" id="logoutBtn" class="text-red-400 hover:text-red-300">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Admin Content -->
+        <div class="admin-content">
+            <!-- Dashboard Section -->
+            <div id="dashboardSection" class="admin-section">
+                <div class="admin-header">
+                    <h1 class="text-2xl font-bold">Dashboard</h1>
+                    <div>
+                        <span class="text-sm text-gray-500" id="currentDate"></span>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="admin-stats">
+                    <div class="stat-card">
+                        <div class="stat-card-value" id="totalClaimsCount">0</div>
+                        <div class="stat-card-label">Total Claims</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-value" id="newClaimsCount">0</div>
+                        <div class="stat-card-label">New Claims</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-value" id="inProgressClaimsCount">0</div>
+                        <div class="stat-card-label">In Progress</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-value" id="completedClaimsCount">0</div>
+                        <div class="stat-card-label">Completed</div>
+                    </div>
+                </div>
+
+                <!-- Recent Claims -->
+                <div class="admin-card">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-lg font-semibold">Recent Claims</h2>
+                        <a href="#claims" class="text-sm" style="color: var(--military-green);">View All</a>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Veteran</th>
+                                    <th>Claim Type</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentClaimsTableBody">
+                                <!-- Recent claims will be populated here by JavaScript -->
+                                <tr>
+                                    <td colspan="5" class="py-4 text-center text-gray-500">No claims found</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <div class="admin-card">
+                        <h2 class="text-lg font-semibold mb-4">Claims by Status</h2>
+                        <div class="h-64">
+                            <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="admin-card">
+                        <h2 class="text-lg font-semibold mb-4">Claims by Branch</h2>
+                        <div class="h-64">
+                            <canvas id="branchChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Claims Section -->
+            <div id="claimsSection" class="admin-section hidden">
+                <div class="admin-header">
+                    <h1 class="text-2xl font-bold">Claims Management</h1>
+                    <div class="flex items-center space-x-2">
+                        <div class="relative">
+                            <input type="text" id="searchClaims" placeholder="Search claims..."
+                                class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <i class="fas fa-search text-gray-400"></i>
+                            </div>
+                        </div>
+                        <button id="exportBtn" class="admin-btn admin-btn-secondary">
+                            <i class="fas fa-download admin-btn-icon"></i> Export
+                        </button>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <div class="mb-4 flex flex-wrap gap-2">
+                        <button class="filter-btn active" data-filter="all">All Claims</button>
+                        <button class="filter-btn" data-filter="new">New</button>
+                        <button class="filter-btn" data-filter="in-progress">In Progress</button>
+                        <button class="filter-btn" data-filter="completed">Completed</button>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <input type="checkbox" id="selectAllClaims" class="mr-2">
+                                        Date
+                                    </th>
+                                    <th>Veteran</th>
+                                    <th>Branch</th>
+                                    <th>Claim Type</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="claimsTableBody">
+                                <!-- Claims will be populated here by JavaScript -->
+                                <tr>
+                                    <td colspan="6" class="py-4 text-center text-gray-500">No claims found</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-4 flex justify-between items-center">
+                        <div>
+                            <span class="text-sm text-gray-500">
+                                Showing <span id="shownClaimsCount">0</span> of <span id="totalClaimsCount2">0</span> claims
+                            </span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button id="bulkActionBtn" class="admin-btn admin-btn-secondary admin-btn-sm" disabled>
+                                <i class="fas fa-cog admin-btn-icon"></i> Bulk Actions
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div id="analyticsSection" class="admin-section hidden">
+                <div class="admin-header">
+                    <h1 class="text-2xl font-bold">Analytics</h1>
+                    <div>
+                        <select id="timeRangeSelect" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <option value="7">Last 7 days</option>
+                            <option value="30" selected>Last 30 days</option>
+                            <option value="90">Last 90 days</option>
+                            <option value="365">Last year</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <h2 class="text-lg font-semibold mb-4">Claims Over Time</h2>
+                    <div class="h-80">
+                        <canvas id="claimsTimeChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <div class="admin-card">
+                        <h2 class="text-lg font-semibold mb-4">Claim Types Distribution</h2>
+                        <div class="h-64">
+                            <canvas id="claimTypesChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="admin-card">
+                        <h2 class="text-lg font-semibold mb-4">Processing Time (Avg. Days)</h2>
+                        <div class="h-64">
+                            <canvas id="processingTimeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-card mt-6">
+                    <h2 class="text-lg font-semibold mb-4">Claims by Location</h2>
+                    <div class="h-96">
+                        <div id="mapChart" class="w-full h-full bg-gray-100 flex items-center justify-center">
+                            <p class="text-gray-500">Map visualization will be displayed here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settingsSection" class="admin-section hidden">
+                <div class="admin-header">
+                    <h1 class="text-2xl font-bold">Settings</h1>
+                </div>
+
+                <div class="admin-card">
+                    <h2 class="text-lg font-semibold mb-4">Account Settings</h2>
+
+                    <form id="accountSettingsForm" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Name</label>
+                                <input type="text" value="Admin User" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 font-medium mb-2">Email</label>
+                                <input type="email" value="admin@example.com" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Change Password</label>
+                            <input type="password" placeholder="New password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600 mb-2">
+                            <input type="password" placeholder="Confirm new password" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="submit" class="admin-btn admin-btn-primary">
+                                <i class="fas fa-save admin-btn-icon"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="admin-card mt-6">
+                    <h2 class="text-lg font-semibold mb-4">Notification Settings</h2>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-medium">Email Notifications</h3>
+                                <p class="text-sm text-gray-500">Receive email notifications for new claims</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-medium">Browser Notifications</h3>
+                                <p class="text-sm text-gray-500">Receive browser notifications for new claims</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="font-medium">Daily Summary</h3>
+                                <p class="text-sm text-gray-500">Receive a daily summary of all claim activities</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-card mt-6">
+                    <h2 class="text-lg font-semibold mb-4">System Settings</h2>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Session Timeout (minutes)</label>
+                            <input type="number" value="30" min="5" max="120" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                        </div>
+
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Data Retention Period (days)</label>
+                            <input type="number" value="365" min="30" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="button" class="admin-btn admin-btn-primary">
+                                <i class="fas fa-save admin-btn-icon"></i> Save Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Claim Details Modal -->
+        <div id="claimModal" class="admin-modal hidden">
+            <div class="admin-modal-content">
+                <div class="admin-modal-header">
+                    <h3 class="admin-modal-title">Claim Details</h3>
+                    <button id="closeModalBtn" class="admin-modal-close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="admin-modal-body">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-gray-50 p-4 rounded">
+                            <h4 class="text-sm font-medium text-gray-500 mb-1">Claim ID</h4>
+                            <p id="claimId" class="font-semibold"></p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded">
+                            <h4 class="text-sm font-medium text-gray-500 mb-1">Submission Date</h4>
+                            <p id="claimDate" class="font-semibold"></p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded">
+                            <h4 class="text-sm font-medium text-gray-500 mb-1">Current Status</h4>
+                            <p id="claimStatus" class="font-semibold"></p>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold mb-3">Veteran Information</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h5 class="text-sm font-medium text-gray-500 mb-1">Name</h5>
+                                <p id="veteranName" class="font-semibold"></p>
+                            </div>
+                            <div>
+                                <h5 class="text-sm font-medium text-gray-500 mb-1">Email</h5>
+                                <p id="veteranEmail" class="font-semibold"></p>
+                            </div>
+                            <div>
+                                <h5 class="text-sm font-medium text-gray-500 mb-1">Phone</h5>
+                                <p id="veteranPhone" class="font-semibold"></p>
+                            </div>
+                            <div>
+                                <h5 class="text-sm font-medium text-gray-500 mb-1">Military Branch</h5>
+                                <p id="veteranBranch" class="font-semibold"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold mb-3">Claim Information</h4>
+                        <div>
+                            <h5 class="text-sm font-medium text-gray-500 mb-1">Claim Type</h5>
+                            <p id="claimType" class="font-semibold mb-3"></p>
+                        </div>
+                        <div>
+                            <h5 class="text-sm font-medium text-gray-500 mb-1">Claim Details</h5>
+                            <p id="claimDetails" class="bg-gray-50 p-3 rounded"></p>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold mb-3">Uploaded Documents</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <h5 class="text-sm font-medium text-gray-500 mb-2">Medical Records</h5>
+                                <ul id="medicalRecordsList" class="list-disc pl-5 text-sm"></ul>
+                            </div>
+                            <div>
+                                <h5 class="text-sm font-medium text-gray-500 mb-2">VA Letters</h5>
+                                <ul id="vaLettersList" class="list-disc pl-5 text-sm"></ul>
+                            </div>
+                            <div>
+                                <h5 class="text-sm font-medium text-gray-500 mb-2">Other Documents</h5>
+                                <ul id="otherDocumentsList" class="list-disc pl-5 text-sm"></ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h4 class="text-lg font-semibold mb-3">Notes History</h4>
+                        <div id="notesHistory" class="space-y-3">
+                            <!-- Notes will be populated here by JavaScript -->
+                            <p class="text-gray-500 text-sm italic">No notes have been added yet.</p>
+                        </div>
+                    </div>
+
+                    <div class="border-t pt-4">
+                        <h4 class="text-lg font-semibold mb-3">Update Status</h4>
+                        <div class="flex space-x-2">
+                            <select id="statusUpdate" class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                                <option value="new">New</option>
+                                <option value="in_review">In Review</option>
+                                <option value="evidence_gathering">Evidence Gathering</option>
+                                <option value="decision_pending">Decision Pending</option>
+                                <option value="approved">Approved</option>
+                                <option value="denied">Denied</option>
+                                <option value="appealed">Appealed</option>
+                            </select>
+                            <button id="updateStatusBtn" class="admin-btn admin-btn-primary">
+                                <i class="fas fa-check admin-btn-icon"></i> Update Status
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 border-t pt-4">
+                        <h4 class="text-lg font-semibold mb-3">Add Note</h4>
+                        <textarea id="adminNote" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600"
+                            placeholder="Add a note about this claim..."></textarea>
+                        <div class="mt-2 flex justify-end">
+                            <button id="addNoteBtn" class="admin-btn admin-btn-primary">
+                                <i class="fas fa-plus admin-btn-icon"></i> Add Note
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-modal-footer">
+                    <button id="closeModalBtn2" class="admin-btn admin-btn-secondary mr-2">
+                        <i class="fas fa-times admin-btn-icon"></i> Close
+                    </button>
+                    <button id="printClaimBtn" class="admin-btn admin-btn-secondary">
+                        <i class="fas fa-print admin-btn-icon"></i> Print
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bulk Actions Modal -->
+        <div id="bulkActionsModal" class="admin-modal hidden">
+            <div class="admin-modal-content" style="max-width: 500px;">
+                <div class="admin-modal-header">
+                    <h3 class="admin-modal-title">Bulk Actions</h3>
+                    <button id="closeBulkModalBtn" class="admin-modal-close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="admin-modal-body">
+                    <p class="mb-4">Apply action to <span id="selectedClaimsCount">0</span> selected claims:</p>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Action</label>
+                            <select id="bulkAction" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                                <option value="">Select an action</option>
+                                <option value="status">Update Status</option>
+                                <option value="export">Export Selected</option>
+                                <option value="delete">Delete Selected</option>
+                            </select>
+                        </div>
+
+                        <div id="bulkStatusSection" class="hidden">
+                            <label class="block text-gray-700 font-medium mb-2">New Status</label>
+                            <select id="bulkStatus" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                                <option value="new">New</option>
+                                <option value="in_review">In Review</option>
+                                <option value="evidence_gathering">Evidence Gathering</option>
+                                <option value="decision_pending">Decision Pending</option>
+                                <option value="approved">Approved</option>
+                                <option value="denied">Denied</option>
+                                <option value="appealed">Appealed</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-modal-footer">
+                    <button id="closeBulkModalBtn2" class="admin-btn admin-btn-secondary mr-2">
+                        <i class="fas fa-times admin-btn-icon"></i> Cancel
+                    </button>
+                    <button id="applyBulkActionBtn" class="admin-btn admin-btn-primary">
+                        <i class="fas fa-check admin-btn-icon"></i> Apply
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Toast -->
+        <div id="notificationToast" class="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 flex items-center space-x-3 transform translate-y-20 transition-transform duration-300 z-50">
+            <div id="notificationIcon" class="text-green-500">
+                <i class="fas fa-check-circle text-xl"></i>
+            </div>
+            <div>
+                <h4 id="notificationTitle" class="font-medium">Success</h4>
+                <p id="notificationMessage" class="text-sm text-gray-600">Action completed successfully.</p>
+            </div>
+            <button id="closeNotificationBtn" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <script type="module" src="js/admin-dashboard.js"></script>
+    <script src="js/admin.js"></script>
+
+    <!-- File Preview Modal -->
+    <div id="filePreviewModal" class="admin-modal hidden">
+        <div class="admin-modal-content">
+            <div class="admin-modal-header">
+                <h3 class="admin-modal-title">File Preview</h3>
+                <button id="closeFilePreviewBtn" class="admin-modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="admin-modal-body">
+                <div id="filePreviewContainer" class="flex flex-col items-center">
+                    <!-- File preview will be displayed here -->
+                    <div id="filePreviewLoading" class="py-10 text-center">
+                        <i class="fas fa-spinner fa-spin text-4xl text-green-600 mb-4"></i>
+                        <p>Loading file preview...</p>
+                    </div>
+                    <div id="filePreviewContent" class="w-full hidden">
+                        <!-- Content will be inserted here based on file type -->
+                    </div>
+                    <div id="filePreviewError" class="py-10 text-center hidden">
+                        <i class="fas fa-exclamation-circle text-4xl text-red-600 mb-4"></i>
+                        <p class="text-red-600">Unable to preview this file type.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="admin-modal-footer">
+                <a id="downloadFileBtn" href="#" target="_blank" class="admin-btn admin-btn-primary">
+                    <i class="fas fa-download admin-btn-icon"></i> Download File
+                </a>
+                <button id="closeFilePreviewBtn2" class="admin-btn admin-btn-secondary ml-2">
+                    <i class="fas fa-times admin-btn-icon"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Upload Modal for Admin -->
+    <div id="fileUploadModal" class="admin-modal hidden">
+        <div class="admin-modal-content">
+            <div class="admin-modal-header">
+                <h3 class="admin-modal-title">Upload Files</h3>
+                <button id="closeFileUploadBtn" class="admin-modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="admin-modal-body">
+                <form id="adminFileUploadForm">
+                    <input type="hidden" id="uploadClaimId" value="">
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-medium mb-2">File Category</label>
+                        <select id="fileCategory" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <option value="medical_records">Medical Records</option>
+                            <option value="va_letters">VA Letters</option>
+                            <option value="other_documents">Other Documents</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-medium mb-2">Select Files</label>
+                        <input type="file" id="adminFileUpload" multiple
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                        <p class="text-xs text-gray-500 mt-1">You can select multiple files (PDF, JPG, PNG, DOC, etc.)</p>
+                    </div>
+
+                    <div id="uploadProgressContainer" class="mb-4 hidden">
+                        <div class="w-full bg-gray-200 rounded-full h-4">
+                            <div id="adminUploadProgressBar" class="bg-green-600 h-4 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-1">
+                            <span id="adminUploadProgressText">0%</span> complete
+                        </p>
+                        <p id="adminUploadStatus" class="text-sm text-gray-700 mt-1"></p>
+                    </div>
+                </form>
+            </div>
+            <div class="admin-modal-footer">
+                <button id="startUploadBtn" class="admin-btn admin-btn-primary">
+                    <i class="fas fa-upload admin-btn-icon"></i> Upload Files
+                </button>
+                <button id="closeFileUploadBtn2" class="admin-btn admin-btn-secondary ml-2">
+                    <i class="fas fa-times admin-btn-icon"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Claim Details Modal -->
+    <div id="claimDetailsModal" class="admin-modal hidden">
+        <div class="admin-modal-content">
+            <div class="admin-modal-header">
+                <h3 class="admin-modal-title">Claim Details</h3>
+                <button id="closeClaimDetailsBtn" class="admin-modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="admin-modal-body">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-gray-50 p-4 rounded">
+                        <h4 class="text-sm font-medium text-gray-500 mb-1">Claim ID</h4>
+                        <p id="claimId" class="font-semibold"></p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded">
+                        <h4 class="text-sm font-medium text-gray-500 mb-1">Submission Date</h4>
+                        <p id="claimDate" class="font-semibold"></p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded">
+                        <h4 class="text-sm font-medium text-gray-500 mb-1">Current Status</h4>
+                        <p id="claimStatus" class="font-semibold"></p>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="text-lg font-semibold mb-3">Veteran Information</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <h5 class="text-sm font-medium text-gray-500 mb-1">Name</h5>
+                            <p id="veteranName" class="font-semibold"></p>
+                        </div>
+                        <div>
+                            <h5 class="text-sm font-medium text-gray-500 mb-1">Email</h5>
+                            <p id="veteranEmail" class="font-semibold"></p>
+                        </div>
+                        <div>
+                            <h5 class="text-sm font-medium text-gray-500 mb-1">Phone</h5>
+                            <p id="veteranPhone" class="font-semibold"></p>
+                        </div>
+                        <div>
+                            <h5 class="text-sm font-medium text-gray-500 mb-1">Military Branch</h5>
+                            <p id="serviceBranch" class="font-semibold"></p>
+                        </div>
+                        <div>
+                            <h5 class="text-sm font-medium text-gray-500 mb-1">Service Start</h5>
+                            <p id="serviceStart" class="font-semibold"></p>
+                        </div>
+                        <div>
+                            <h5 class="text-sm font-medium text-gray-500 mb-1">Service End</h5>
+                            <p id="serviceEnd" class="font-semibold"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="text-lg font-semibold mb-3">Claim Information</h4>
+                    <div>
+                        <h5 class="text-sm font-medium text-gray-500 mb-1">Claim Type</h5>
+                        <p id="claimType" class="font-semibold mb-3"></p>
+                    </div>
+                    <div>
+                        <h5 class="text-sm font-medium text-gray-500 mb-1">Claim Details</h5>
+                        <p id="claimDetails" class="bg-gray-50 p-3 rounded"></p>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="text-lg font-semibold mb-3">Uploaded Documents</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <h5 class="text-sm font-medium text-gray-500 mb-2">Medical Records</h5>
+                            <ul id="medicalRecordsList" class="list-disc pl-5 text-sm"></ul>
+                        </div>
+                        <div>
+                            <h5 class="text-sm font-medium text-gray-500 mb-2">VA Letters</h5>
+                            <ul id="vaLettersList" class="list-disc pl-5 text-sm"></ul>
+                        </div>
+                        <div>
+                            <h5 class="text-sm font-medium text-gray-500 mb-2">Other Documents</h5>
+                            <ul id="otherDocumentsList" class="list-disc pl-5 text-sm"></ul>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <button id="uploadFilesBtn" class="admin-btn admin-btn-primary">
+                            <i class="fas fa-upload admin-btn-icon"></i> Upload Files
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <h4 class="text-lg font-semibold mb-3">Notes History</h4>
+                    <ul id="notesList" class="space-y-3">
+                        <!-- Notes will be populated here by JavaScript -->
+                    </ul>
+                </div>
+            </div>
+            <div class="admin-modal-footer">
+                <button id="closeClaimDetailsBtn2" class="admin-btn admin-btn-secondary">
+                    <i class="fas fa-times admin-btn-icon"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Status Modal -->
+    <div id="updateStatusModal" class="admin-modal hidden">
+        <div class="admin-modal-content">
+            <div class="admin-modal-header">
+                <h3 class="admin-modal-title">Update Claim Status</h3>
+                <button id="closeUpdateStatusBtn" class="admin-modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="admin-modal-body">
+                <form id="updateStatusForm">
+                    <input type="hidden" id="updateClaimId" value="">
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-medium mb-2">Current Status</label>
+                        <p id="currentStatus" class="font-semibold"></p>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-medium mb-2">New Status</label>
+                        <select id="newStatus" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <option value="new">New</option>
+                            <option value="in_review">In Review</option>
+                            <option value="evidence_gathering">Evidence Gathering</option>
+                            <option value="decision_pending">Decision Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="denied">Denied</option>
+                            <option value="appealed">Appealed</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-medium mb-2">Add Note</label>
+                        <textarea id="statusNote" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600"
+                            placeholder="Add a note about this status change (optional)"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="admin-modal-footer">
+                <button type="submit" form="updateStatusForm" class="admin-btn admin-btn-primary">
+                    <i class="fas fa-check admin-btn-icon"></i> Update Status
+                </button>
+                <button id="closeUpdateStatusBtn2" class="admin-btn admin-btn-secondary ml-2">
+                    <i class="fas fa-times admin-btn-icon"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

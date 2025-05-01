@@ -1,0 +1,122 @@
+/* Custom styles for Veterans Claims Assistance Portal */
+
+/* Custom colors */
+:root {
+    --military-green: #4b5320;
+    --military-tan: #b5a642;
+    --military-brown: #8b4513;
+    --military-gray: #5a5a5a;
+}
+
+/* Custom focus styles */
+*:focus {
+    outline: 2px solid var(--military-green);
+    outline-offset: 2px;
+}
+
+/* Header and navigation styles */
+header {
+    background-color: var(--military-green) !important;
+}
+
+/* Button styles */
+.btn-primary {
+    background-color: var(--military-green) !important;
+    border-color: var(--military-green) !important;
+}
+
+.btn-primary:hover {
+    background-color: #3a4119 !important;
+    border-color: #3a4119 !important;
+}
+
+/* Form styles */
+.form-control:focus {
+    border-color: var(--military-green);
+    box-shadow: 0 0 0 0.2rem rgba(75, 83, 32, 0.25);
+}
+
+/* Custom card styles */
+.card {
+    border-color: var(--military-tan);
+}
+
+.card-header {
+    background-color: var(--military-tan);
+    color: white;
+}
+
+/* Status badges */
+.status-new {
+    background-color: #f0ad4e;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.status-in-progress {
+    background-color: #5bc0de;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.status-completed {
+    background-color: #5cb85c;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+/* File upload styling */
+.file-upload-container {
+    border: 2px dashed var(--military-tan);
+    padding: 1.5rem;
+    text-align: center;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.file-upload-container:hover {
+    background-color: rgba(181, 166, 66, 0.1);
+}
+
+/* Document list styling */
+.document-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.document-list li {
+    padding: 0.5rem;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.document-list li:last-child {
+    border-bottom: none;
+}
+
+/* Admin dashboard specific styles */
+.filter-btn.active {
+    background-color: var(--military-green) !important;
+    color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    header .flex {
+        flex-direction: column;
+    }
+    
+    header nav ul {
+        margin-top: 1rem;
+    }
+}
