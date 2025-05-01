@@ -3,405 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://*.firebaseio.com https://firebasestorage.googleapis.com https://*.googleapis.com https://identitytoolkit.googleapis.com;">
-    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta name="referrer" content="no-referrer">
-    <meta name="description" content="Secure portal for veterans to submit VA claims assistance requests">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com/firebasejs/ 'unsafe-inline'; connect-src https://*.firebaseio.com https://firebasestorage.googleapis.com https://*.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://firebasestorage.googleapis.com; font-src 'self'; frame-src 'self';">
     <title>Veterans VA Claims Assistance Portal</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
-    <script src="js/security.js"></script>
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
 </head>
-<body class="bg-gray-50">
-    <header class="text-white p-4 shadow-md" style="background-image: url('images/military-pattern.svg'); background-repeat: repeat;">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Veterans VA Claims Assistance</h1>
+<body class="bg-gray-100 font-sans">
+    <header class="bg-green-800 text-white shadow-md">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="images/logo.png" alt="Veterans Claims Logo" class="h-12 mr-3">
+                <div>
+                    <h1 class="text-2xl font-bold">Veterans VA Claims Assistance Portal</h1>
+                    <p class="text-sm">Supporting our veterans with their VA claims</p>
+                </div>
+            </div>
             <nav>
-                <ul class="flex space-x-4">
-                    <li><a href="index.html" class="hover:underline">Home</a></li>
-                    <li><a href="submit.html" class="hover:underline">Submit Request</a></li>
-                    <li><a href="admin.html" class="hover:underline">Admin</a></li>
+                <ul class="flex space-x-6">
+                    <li><a href="index.html" class="hover:text-green-300 font-semibold">Home</a></li>
+                    <li><a href="submit.html" class="hover:text-green-300">Submit Claim</a></li>
+                    <li><a href="admin.html" class="hover:text-green-300">Admin</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <main class="container mx-auto py-8 px-4">
-        <div class="flex flex-col gap-8">
-            <section class="bg-green-800 text-white p-8 rounded-lg shadow-lg">
-                <h1 class="text-4xl font-bold mb-4">Veterans VA Claims Assistance</h1>
-                <p class="text-xl mb-6">
-                    Get expert help with your VA claims process. I'm dedicated to helping veterans like you navigate the complex VA claims system.
-                </p>
-                <a href="submit.html" class="bg-white text-green-800 px-6 py-3 rounded-md font-semibold text-lg hover:bg-gray-100 transition-colors inline-block">
-                    Submit Your Request
-                </a>
-            </section>
-
-            <section class="grid md:grid-cols-3 gap-6 mt-4">
-                <div class="feature-card">
-                    <div class="feature-icon mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-700">
-                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="9" cy="7" r="4"></circle>
-                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                        </svg>
-                    </div>
-                    <h2 class="text-xl font-bold mb-3">Personalized Guidance</h2>
-                    <p>
-                        Receive one-on-one assistance from someone who understands the VA claims process and is committed to your success.
-                    </p>
+    <div class="bg-cover bg-center h-96" style="background-image: url('images/military-pattern.svg');">
+        <div class="container mx-auto px-4 h-full flex items-center">
+            <div class="bg-white bg-opacity-90 p-8 rounded-lg shadow-lg max-w-2xl">
+                <h2 class="text-3xl font-bold text-green-800 mb-4">Veterans Claims Made Easy</h2>
+                <p class="text-lg mb-6">We're here to help you navigate the VA claims process. Our secure portal allows you to submit claims, track progress, and get the benefits you deserve.</p>
+                <div class="flex space-x-4">
+                    <a href="submit.html" class="bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-6 rounded-lg transition duration-300">Submit a Claim</a>
+                    <a href="#services" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-6 rounded-lg transition duration-300">Learn More</a>
                 </div>
-                <div class="feature-card">
-                    <div class="feature-icon mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-700">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                        </svg>
-                    </div>
-                    <h2 class="text-xl font-bold mb-3">Secure Submissions</h2>
-                    <p>
-                        Your information is protected with a secure submission system. Only I will have access to your details, ensuring your privacy.
-                    </p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon mb-4">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-700">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                    </div>
-                    <h2 class="text-xl font-bold mb-3">Faster Results</h2>
-                    <p>
-                        My experience helps streamline the claims process, potentially reducing wait times for decisions on your behalf.
-                    </p>
-                </div>
-            </section>
-
-            <section id="about" class="bg-white p-8 rounded-lg shadow-md mt-4">
-                <h2 class="text-2xl font-bold mb-4 text-green-800">How It Works</h2>
-                <ol class="list-decimal pl-6 space-y-3">
-                    <li>
-                        <strong>Submit your request</strong> - Fill out the secure online form with details about your claim.
-                    </li>
-                    <li>
-                        <strong>I review your information</strong> - I'll personally review your submission and prepare to assist you.
-                    </li>
-                    <li>
-                        <strong>Get personalized assistance</strong> - You'll receive guidance through the VA claims process with dedicated support.
-                    </li>
-                </ol>
-                <div class="mt-6">
-                    <a href="submit.html" class="bg-green-700 text-white px-6 py-3 rounded-md font-semibold text-lg hover:bg-green-800 transition-colors inline-block">
-                        Start Your Claim Request
-                    </a>
-                </div>
-            </section>
-
-            <section id="services" class="bg-white p-8 rounded-lg shadow-md mt-4">
-                <h2 class="text-2xl font-bold mb-4 text-green-800">Services Offered</h2>
-                <ul class="list-disc pl-6 space-y-2">
-                    <li>Assistance with initial VA claims filing</li>
-                    <li>Help with gathering necessary documentation</li>
-                    <li>Guidance on appealing denied claims</li>
-                    <li>Support with VA claim status inquiries</li>
-                    <li>Education on VA benefits eligibility</li>
-                </ul>
-            </section>
-
-            <section class="bg-white p-8 rounded-lg shadow-md mt-6">
-                <h2 class="text-2xl font-bold mb-6 text-green-800 text-center">Track Your Claim Progress</h2>
-                <p class="text-center mb-8">Our streamlined process ensures your claim is handled efficiently from submission to approval.</p>
-
-                <div class="claim-status-tracker">
-                    <div class="tracker-steps">
-                        <div class="tracker-step completed">
-                            <div class="step-circle">1</div>
-                            <div class="step-label">Submit Claim</div>
-                        </div>
-                        <div class="tracker-step active">
-                            <div class="step-circle">2</div>
-                            <div class="step-label">Initial Review</div>
-                        </div>
-                        <div class="tracker-step">
-                            <div class="step-circle">3</div>
-                            <div class="step-label">Evidence Gathering</div>
-                        </div>
-                        <div class="tracker-step">
-                            <div class="step-circle">4</div>
-                            <div class="step-label">Decision</div>
-                        </div>
-                        <div class="tracker-step">
-                            <div class="step-circle">5</div>
-                            <div class="step-label">Completion</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="text-center mt-6">
-                    <a href="submit.html" class="bg-green-700 text-white px-6 py-3 rounded-md font-semibold text-lg hover:bg-green-800 transition-colors inline-block">
-                        Start Your Claim
-                    </a>
-                </div>
-            </section>
-
-            <section class="bg-white p-8 rounded-lg shadow-md mt-6">
-                <h2 class="text-2xl font-bold mb-6 text-green-800 text-center">Veteran Success Stories</h2>
-
-                <div class="testimonials-carousel">
-                    <div class="testimonial-slide active">
-                        <div class="testimonial-content">
-                            The assistance I received was invaluable. My claim was approved much faster than I expected, and the guidance throughout the process made everything clear and straightforward.
-                        </div>
-                        <div class="testimonial-author">
-                            <img src="images/army.svg" alt="Army Veteran" class="testimonial-author-image">
-                            <div class="testimonial-author-info">
-                                <div class="testimonial-author-name">James R.</div>
-                                <div class="testimonial-author-branch">U.S. Army Veteran</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="testimonial-slide">
-                        <div class="testimonial-content">
-                            After struggling with my VA claim for years, I finally got the help I needed. The personalized support made all the difference in getting my disability rating corrected.
-                        </div>
-                        <div class="testimonial-author">
-                            <img src="images/navy.svg" alt="Navy Veteran" class="testimonial-author-image">
-                            <div class="testimonial-author-info">
-                                <div class="testimonial-author-name">Michael T.</div>
-                                <div class="testimonial-author-branch">U.S. Navy Veteran</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="testimonial-slide">
-                        <div class="testimonial-content">
-                            The knowledge and expertise provided helped me navigate the complex VA system. I'm grateful for the support that led to a successful outcome for my claim.
-                        </div>
-                        <div class="testimonial-author">
-                            <img src="images/air-force.svg" alt="Air Force Veteran" class="testimonial-author-image">
-                            <div class="testimonial-author-info">
-                                <div class="testimonial-author-name">Sarah L.</div>
-                                <div class="testimonial-author-branch">U.S. Air Force Veteran</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="testimonial-controls">
-                        <button class="testimonial-control prev">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="15 18 9 12 15 6"></polyline>
-                            </svg>
-                        </button>
-                        <button class="testimonial-control next">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="9 18 15 12 9 6"></polyline>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-            <section class="bg-white p-8 rounded-lg shadow-md mt-6">
-                <h2 class="text-2xl font-bold mb-6 text-green-800 text-center">Frequently Asked Questions</h2>
-
-                <div class="faq-container">
-                    <div class="faq-item active">
-                        <div class="faq-question">
-                            What types of VA claims can you help with?
-                        </div>
-                        <div class="faq-answer">
-                            <p>I can assist with various types of VA claims, including:</p>
-                            <ul class="list-disc pl-6 mt-2 space-y-1">
-                                <li>Disability compensation claims</li>
-                                <li>Pension claims</li>
-                                <li>Appeals for denied claims</li>
-                                <li>Claims for increased disability ratings</li>
-                                <li>Dependency and indemnity compensation</li>
-                                <li>Healthcare eligibility claims</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            How long does the VA claims process typically take?
-                        </div>
-                        <div class="faq-answer">
-                            <p>The VA claims process can vary significantly depending on the complexity of your claim, the type of claim, and current VA processing times. Initial claims typically take 3-5 months, but can take longer. With my assistance, we can ensure your claim is properly prepared and documented to avoid unnecessary delays.</p>
-                        </div>
-                    </div>
-
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            What documents do I need to submit a VA claim?
-                        </div>
-                        <div class="faq-answer">
-                            <p>Important documents for VA claims typically include:</p>
-                            <ul class="list-disc pl-6 mt-2 space-y-1">
-                                <li>DD-214 (Certificate of Release or Discharge from Active Duty)</li>
-                                <li>Medical records (both military and civilian)</li>
-                                <li>Service treatment records</li>
-                                <li>Supporting statements from family, friends, or fellow service members</li>
-                                <li>VA medical examinations</li>
-                            </ul>
-                            <p class="mt-2">Don't worry if you don't have all these documents - I can help you identify what you need and how to obtain them.</p>
-                        </div>
-                    </div>
-
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            Is there a fee for your assistance?
-                        </div>
-                        <div class="faq-answer">
-                            <p>I provide assistance to veterans at no cost. My goal is to ensure you receive the benefits you've earned through your service. This is my way of giving back to those who have served our country.</p>
-                        </div>
-                    </div>
-
-                    <div class="faq-item">
-                        <div class="faq-question">
-                            What if my claim has been denied?
-                        </div>
-                        <div class="faq-answer">
-                            <p>If your claim has been denied, don't lose hope. Many claims are initially denied but later approved on appeal. I can help you understand the reason for the denial, gather additional evidence if needed, and guide you through the appeals process. With the right approach, we can work to overturn the denial and secure the benefits you deserve.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="mt-8 bg-gray-100 p-8 rounded-lg shadow-md">
-                <h2 class="text-2xl font-bold mb-6 text-green-800 text-center">Proudly Serving All Military Branches</h2>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 justify-items-center">
-                    <div class="flex flex-col items-center">
-                        <img src="images/army.svg" alt="U.S. Army Emblem" class="w-24 h-24 mb-2 object-contain military-emblem">
-                        <span class="font-semibold text-green-800">Army</span>
-                    </div>
-                    <div class="flex flex-col items-center">
-                        <img src="images/navy.svg" alt="U.S. Navy Emblem" class="w-24 h-24 mb-2 object-contain military-emblem">
-                        <span class="font-semibold text-green-800">Navy</span>
-                    </div>
-                    <div class="flex flex-col items-center">
-                        <img src="images/air-force.svg" alt="U.S. Air Force Emblem" class="w-24 h-24 mb-2 object-contain military-emblem">
-                        <span class="font-semibold text-green-800">Air Force</span>
-                    </div>
-                    <div class="flex flex-col items-center">
-                        <img src="images/marines.svg" alt="U.S. Marine Corps Emblem" class="w-24 h-24 mb-2 object-contain military-emblem">
-                        <span class="font-semibold text-green-800">Marines</span>
-                    </div>
-                    <div class="flex flex-col items-center">
-                        <img src="images/space-force.svg" alt="U.S. Space Force Emblem" class="w-24 h-24 mb-2 object-contain military-emblem">
-                        <span class="font-semibold text-green-800">Space Force</span>
-                    </div>
-                </div>
-                <p class="text-center mt-6 text-gray-700">
-                    As a dedicated advocate for veterans from all branches of service, I understand the unique challenges you face and am committed to helping you navigate the VA claims process.
-                </p>
-            </section>
+            </div>
         </div>
-    </main>
+    </div>
 
-    <footer class="text-white p-4 mt-8" style="background-image: url('images/military-pattern.svg'); background-repeat: repeat;">
-        <div class="container mx-auto text-center">
-            <div class="flex flex-wrap justify-center gap-4 mb-4">
-                <img src="images/army.svg" alt="U.S. Army Emblem" class="w-12 h-12 object-contain military-emblem">
-                <img src="images/navy.svg" alt="U.S. Navy Emblem" class="w-12 h-12 object-contain military-emblem">
-                <img src="images/air-force.svg" alt="U.S. Air Force Emblem" class="w-12 h-12 object-contain military-emblem">
-                <img src="images/marines.svg" alt="U.S. Marine Corps Emblem" class="w-12 h-12 object-contain military-emblem">
-                <img src="images/space-force.svg" alt="U.S. Space Force Emblem" class="w-12 h-12 object-contain military-emblem">
+    <section id="services" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-green-800 mb-12">Our Services</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-gray-50 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                    <div class="text-green-700 text-4xl mb-4">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Claim Submission</h3>
+                    <p class="text-gray-700">Submit your VA claims securely through our portal. We'll help you organize your documentation and ensure your claim is properly filed.</p>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                    <div class="text-green-700 text-4xl mb-4">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Claim Tracking</h3>
+                    <p class="text-gray-700">Track the status of your claims in real-time. Get updates on your claim's progress and know exactly where you stand.</p>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                    <div class="text-green-700 text-4xl mb-4">
+                        <i class="fas fa-hands-helping"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Veteran Support</h3>
+                    <p class="text-gray-700">Get assistance from experienced veterans who understand the claims process. We're here to help you navigate the system.</p>
+                </div>
             </div>
+        </div>
+    </section>
 
-            <div class="footer-links">
-                <a href="index.html">Home</a>
-                <a href="submit.html">Submit Claim</a>
-                <a href="#about">How It Works</a>
-                <a href="#services">Services</a>
-                <a href="admin.html">Admin</a>
+    <section class="py-16 bg-gray-100">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-green-800 mb-12">Military Branches We Serve</h2>
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-8 justify-items-center">
+                <div class="text-center">
+                    <img src="images/army.svg" alt="Army" class="h-24 mx-auto mb-4">
+                    <h3 class="font-bold">Army</h3>
+                </div>
+                <div class="text-center">
+                    <img src="images/navy.svg" alt="Navy" class="h-24 mx-auto mb-4">
+                    <h3 class="font-bold">Navy</h3>
+                </div>
+                <div class="text-center">
+                    <img src="images/air-force.svg" alt="Air Force" class="h-24 mx-auto mb-4">
+                    <h3 class="font-bold">Air Force</h3>
+                </div>
+                <div class="text-center">
+                    <img src="images/marines.svg" alt="Marines" class="h-24 mx-auto mb-4">
+                    <h3 class="font-bold">Marines</h3>
+                </div>
+                <div class="text-center">
+                    <img src="images/space-force.svg" alt="Space Force" class="h-24 mx-auto mb-4">
+                    <h3 class="font-bold">Space Force</h3>
+                </div>
             </div>
+        </div>
+    </section>
 
-            <p>© <script>document.write(new Date().getFullYear())</script> Veterans VA Claims Assistance Portal. All rights reserved.</p>
-            <p class="text-sm mt-2">This service is not affiliated with the Department of Veterans Affairs.</p>
-            <p class="text-sm mt-2">Dedicated to serving those who have served our country.</p>
+    <section class="py-16 bg-green-800 text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-8">Ready to Submit Your Claim?</h2>
+            <p class="text-xl mb-8 max-w-3xl mx-auto">Our secure portal makes it easy to submit your VA claim and get the benefits you deserve. Start the process today.</p>
+            <a href="submit.html" class="bg-white text-green-800 hover:bg-gray-100 font-bold py-3 px-8 rounded-lg text-lg transition duration-300">Submit a Claim Now</a>
+        </div>
+    </section>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Veterans VA Claims Assistance Portal</h3>
+                    <p>Supporting our veterans with their VA claims process.</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="hover:text-green-300">Home</a></li>
+                        <li><a href="submit.html" class="hover:text-green-300">Submit Claim</a></li>
+                        <li><a href="admin.html" class="hover:text-green-300">Admin Portal</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Contact Us</h3>
+                    <p>Email: support@vetsclaims.org</p>
+                    <p>Phone: (555) 123-4567</p>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+                <p>&copy; 2023 Veterans VA Claims Assistance Portal. All rights reserved.</p>
+            </div>
         </div>
     </footer>
 
+    <!-- Security Script -->
+    <script src="js/security.js"></script>
+    
+    <!-- Main Script -->
     <script src="js/script.js"></script>
-    <!-- Firebase Scripts -->
-    <script type="module" src="js/firebase-config.js"></script>
-    <!-- Firebase Test Script (remove in production) -->
-    <script type="module" src="js/firebase-test.js"></script>
-
-    <!-- Firebase Connection Test -->
+    
+    <!-- Firebase Initialization -->
     <script type="module">
-      import { database, ref, set, get, child } from './js/firebase-config.js';
-
-      // Create a test UI
-      document.addEventListener('DOMContentLoaded', function() {
-        const testContainer = document.createElement('div');
-        testContainer.className = 'fixed bottom-4 left-4 bg-white p-4 rounded-lg shadow-lg z-50 max-w-md';
-        testContainer.innerHTML = `
-          <h3 class="text-lg font-bold mb-2">Firebase Connection Test</h3>
-          <div id="connectionStatus" class="mb-4">
-            <p>Click the button below to test Firebase connection</p>
-          </div>
-          <button id="testConnectionBtn" class="bg-green-700 text-white px-4 py-2 rounded">Test Connection</button>
-          <button id="closeTestBtn" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">×</button>
-        `;
-        document.body.appendChild(testContainer);
-
-        // Add event listeners
-        document.getElementById('closeTestBtn').addEventListener('click', function() {
-          testContainer.remove();
-        });
-
-        document.getElementById('testConnectionBtn').addEventListener('click', async function() {
-          const connectionStatus = document.getElementById('connectionStatus');
-          connectionStatus.innerHTML = '<p class="text-gray-500">Testing connection to Firebase...</p>';
-
-          try {
-            // Test database connection
-            const testRef = ref(database, 'test');
-            const timestamp = new Date().toISOString();
-            await set(testRef, { timestamp, message: 'Firebase connection test' });
-
-            // Read back the data
-            const snapshot = await get(child(ref(database), 'test'));
-            if (snapshot.exists()) {
-              connectionStatus.innerHTML = `
-                <p class="text-green-500 font-semibold">✓ Firebase connection successful!</p>
-                <p class="text-sm text-gray-600 mt-2">Your Firebase configuration is working correctly.</p>
-                <div class="mt-2 p-2 bg-gray-200 rounded text-xs font-mono overflow-auto">
-                  <pre>${JSON.stringify(snapshot.val(), null, 2)}</pre>
-                </div>
-              `;
-            } else {
-              connectionStatus.innerHTML = `
-                <p class="text-yellow-500 font-semibold">⚠ Connection successful, but no data returned.</p>
-                <p class="text-sm text-gray-600 mt-2">This might be due to database security rules.</p>
-              `;
-            }
-          } catch (error) {
-            console.error('Firebase connection test failed:', error);
-            connectionStatus.innerHTML = `
-              <p class="text-red-500 font-semibold">✗ Firebase connection failed!</p>
-              <p class="text-sm text-gray-600 mt-2">Error: ${error.message}</p>
-              <div class="mt-2 p-2 bg-gray-100 rounded text-sm">
-                <p>Common issues:</p>
-                <ul class="list-disc pl-5 mt-1">
-                  <li>Incorrect Firebase configuration</li>
-                  <li>Missing or incorrect API key</li>
-                  <li>Database rules preventing read/write</li>
-                  <li>Network connectivity issues</li>
-                </ul>
-              </div>
-            `;
-          }
-        });
-      });
+      import { database } from './js/firebase-config.js';
+      console.log('Firebase initialized successfully');
+    <!-- Firebase Initialization -->
+    <script type="module" src="js/firebase-init.js"></script>
     </script>
 </body>
 </html>
