@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Storage Tests</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2e7d32;
+        }
+        .test-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        .log-container {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+            font-family: monospace;
+        }
+        button {
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #1b5e20;
+        }
+    </style>
+</head>
+<body>
+    <h1>Firebase Storage Tests</h1>
+    
+    <div class="test-container">
+        <div class="test-title">Test 1: Firebase Storage Initialization</div>
+        <button onclick="runTest('storageInitTest')">Run Test</button>
+        <div id="storageInitTestResult" class="test-result"></div>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-title">Test 2: File Upload to Firebase Storage</div>
+        <button onclick="runTest('uploadTest')">Run Test</button>
+        <div id="uploadTestResult" class="test-result"></div>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-title">Test 3: File Download from Firebase Storage</div>
+        <button onclick="runTest('downloadTest')">Run Test</button>
+        <div id="downloadTestResult" class="test-result"></div>
+    </div>
+    
+    <button onclick="runAllTests()">Run All Tests</button>
+    
+    <div class="log-container" id="logContainer">
+        <div class="log-entry">Test logs will appear here...</div>
+    </div>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    
+    <!-- Firebase Config -->
+    <script src="js/firebase-config-global.js"></script>
+    
+    <!-- Test Script -->
+    <script src="js/storage-tests.js"></script>
+    
+    <script>
+        // Override console.log to display in the log container
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        const logContainer = document.getElementById('logContainer');
+        
+        console.log = function() {
+            const args = Array.from(arguments);
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg) : arg
+            ).join(' ');
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.textContent = message;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            originalConsoleLog.apply(console, arguments);
+        };
+        
+        console.error = function() {
+            const args = Array.from(arguments);
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg) : arg
+            ).join(' ');
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.style.color = '#c62828';
+            logEntry.textContent = message;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            originalConsoleError.apply(console, arguments);
+        };
+        
+        // Run individual test
+        async function runTest(testName) {
+            const resultElement = document.getElementById(`${testName}Result`);
+            resultElement.textContent = 'Running test...';
+            resultElement.className = 'test-result';
+            
+            try {
+                let result;
+                switch (testName) {
+                    case 'storageInitTest':
+                        result = window.storageTests.testStorageInitialization();
+                        break;
+                    case 'uploadTest':
+                        result = await window.storageTests.testFileUpload();
+                        break;
+                    case 'downloadTest':
+                        result = await window.storageTests.testFileDownload();
+                        break;
+                }
+                
+                if (result) {
+                    resultElement.textContent = 'Test passed!';
+                    resultElement.className = 'test-result success';
+                } else {
+                    resultElement.textContent = 'Test failed. Check logs for details.';
+                    resultElement.className = 'test-result error';
+                }
+            } catch (error) {
+                console.error(`Error running ${testName}:`, error);
+                resultElement.textContent = `Error: ${error.message}`;
+                resultElement.className = 'test-result error';
+            }
+        }
+        
+        // Run all tests
+        async function runAllTests() {
+            console.log('Running all tests...');
+            
+            // Clear previous results
+            document.getElementById('storageInitTestResult').textContent = '';
+            document.getElementById('uploadTestResult').textContent = '';
+            document.getElementById('downloadTestResult').textContent = '';
+            
+            const results = await window.storageTests.runAllTests();
+            
+            // Update UI with results
+            if (results.storageInitTest) {
+                document.getElementById('storageInitTestResult').textContent = 'Test passed!';
+                document.getElementById('storageInitTestResult').className = 'test-result success';
+            } else {
+                document.getElementById('storageInitTestResult').textContent = 'Test failed. Check logs for details.';
+                document.getElementById('storageInitTestResult').className = 'test-result error';
+            }
+            
+            if (results.uploadTest) {
+                document.getElementById('uploadTestResult').textContent = 'Test passed!';
+                document.getElementById('uploadTestResult').className = 'test-result success';
+            } else {
+                document.getElementById('uploadTestResult').textContent = 'Test failed. Check logs for details.';
+                document.getElementById('uploadTestResult').className = 'test-result error';
+            }
+            
+            if (results.downloadTest) {
+                document.getElementById('downloadTestResult').textContent = 'Test passed!';
+                document.getElementById('downloadTestResult').className = 'test-result success';
+            } else {
+                document.getElementById('downloadTestResult').textContent = 'Test failed. Check logs for details.';
+                document.getElementById('downloadTestResult').className = 'test-result error';
+            }
+        }
+    </script>
+</body>
+</html>
