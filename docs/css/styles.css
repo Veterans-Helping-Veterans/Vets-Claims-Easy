@@ -3,9 +3,11 @@
 /* Custom colors */
 :root {
     --military-green: #4b5320;
+    --military-light-green: #6b7b30;
     --military-tan: #b5a642;
     --military-brown: #8b4513;
     --military-gray: #5a5a5a;
+    --military-light-gray: #f0f0f0;
 }
 
 /* Custom focus styles */
@@ -17,6 +19,7 @@
 /* Header and navigation styles */
 header {
     background-color: var(--military-green) !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* Button styles */
@@ -36,9 +39,89 @@ header {
     box-shadow: 0 0 0 0.2rem rgba(75, 83, 32, 0.25);
 }
 
+/* Multi-step form styles */
+.form-step {
+    transition: all 0.3s ease-in-out;
+}
+
+.form-step.hidden {
+    display: none;
+}
+
+/* Progress bar animation */
+#progress-bar {
+    transition: width 0.5s ease-in-out;
+}
+
+/* Input field focus and hover effects */
+input:focus, select:focus, textarea:focus {
+    border-color: var(--military-green) !important;
+    box-shadow: 0 0 0 3px rgba(75, 83, 32, 0.2) !important;
+}
+
+input:hover, select:hover, textarea:hover {
+    border-color: var(--military-light-green);
+}
+
+/* Custom checkbox styling */
+input[type="checkbox"] {
+    position: relative;
+    cursor: pointer;
+}
+
+input[type="checkbox"]:checked {
+    background-color: var(--military-green);
+    border-color: var(--military-green);
+}
+
+/* File upload dropzone styling */
+#dropzone {
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+#dropzone:hover {
+    background-color: rgba(75, 83, 32, 0.05);
+    border-color: var(--military-green);
+}
+
+#dropzone svg {
+    transition: transform 0.3s ease;
+}
+
+#dropzone:hover svg {
+    transform: translateY(-5px);
+}
+
+/* File preview item styling */
+#file-preview > div {
+    transition: all 0.2s ease;
+}
+
+#file-preview > div:hover {
+    background-color: #f9f9f9;
+    transform: translateX(5px);
+}
+
+.remove-file {
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.remove-file:hover {
+    opacity: 1;
+}
+
 /* Custom card styles */
 .card {
     border-color: var(--military-tan);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .card-header {
@@ -75,10 +158,12 @@ header {
     text-align: center;
     border-radius: 0.5rem;
     margin-bottom: 1rem;
+    transition: all 0.3s ease;
 }
 
 .file-upload-container:hover {
     background-color: rgba(181, 166, 66, 0.1);
+    border-color: var(--military-green);
 }
 
 /* Document list styling */
@@ -93,6 +178,11 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.document-list li:hover {
+    background-color: rgba(75, 83, 32, 0.05);
 }
 
 .document-list li:last-child {
@@ -105,18 +195,66 @@ header {
     color: white;
 }
 
+/* Button animations */
+button {
+    transition: all 0.2s ease;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* Form section styling */
+.form-step h3 {
+    position: relative;
+    padding-bottom: 0.5rem;
+}
+
+.form-step h3:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background-color: var(--military-green);
+    transition: width 0.3s ease;
+}
+
+.form-step h3:hover:after {
+    width: 100px;
+}
+
+/* Success message animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.success-message {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .container {
         padding-left: 1rem;
         padding-right: 1rem;
     }
-    
+
     header .flex {
         flex-direction: column;
     }
-    
+
     header nav ul {
         margin-top: 1rem;
+    }
+
+    .form-step h3:after {
+        width: 30px;
+    }
+
+    .form-step h3:hover:after {
+        width: 60px;
     }
 }
