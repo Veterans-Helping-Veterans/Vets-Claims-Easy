@@ -4,15 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; connect-src 'self' https://*.firebaseio.com https://firebasestorage.googleapis.com https://*.googleapis.com https://identitytoolkit.googleapis.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://www.gstatic.com/firebasejs/; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://firebasestorage.googleapis.com; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://*.firebaseio.com https://firebasestorage.googleapis.com https://*.googleapis.com https://identitytoolkit.googleapis.com;">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta http-equiv="X-Frame-Options" content="DENY">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta name="referrer" content="no-referrer">
-    <meta name="description" content="Secure admin dashboard for veterans claims assistance portal">
-    <title>Admin Dashboard - Veterans VA Claims Assistance Portal</title>
+    <meta name="description" content="Admin portal for managing veterans' VA claims">
+    <title>Admin Portal - Veterans Claims</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="images/favicon.ico" type="image/x-icon">
+</head>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/security.js"></script>
@@ -592,10 +594,10 @@
 
     <script type="module" src="js/admin-dashboard.js"></script>
     <script type="module" src="js/admin.js"></script>
+    <!-- Admin Test Script (remove in production) -->
+    <script type="module" src="js/admin-test.js"></script>
     <script type="module" src="js/storage-monitor.js"></script>
     <script type="module" src="js/admin-storage-monitor.js"></script>
-    <!-- Firebase Initialization -->
-    <script type="module" src="js/firebase-init.js"></script>
 
     <!-- File Preview Modal -->
     <div id="filePreviewModal" class="admin-modal hidden">
@@ -836,6 +838,8 @@
                 </button>
             </div>
         </div>
+    <!-- Firebase Initialization -->
+    <script type="module" src="js/firebase-init.js"></script>
     </div>
 </body>
 </html>
