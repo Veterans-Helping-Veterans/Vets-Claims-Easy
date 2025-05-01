@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Integration Tests</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2e7d32;
+        }
+        .test-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        .error {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        .log-container {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+            font-family: monospace;
+        }
+        button {
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #1b5e20;
+        }
+    </style>
+</head>
+<body>
+    <h1>Firebase Integration Tests</h1>
+    
+    <div class="test-container">
+        <div class="test-title">Test 1: Form Submission to Firebase</div>
+        <button onclick="runTest('formSubmissionTest')">Run Test</button>
+        <div id="formSubmissionTestResult" class="test-result"></div>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-title">Test 2: Admin Dashboard Data Retrieval</div>
+        <button onclick="runTest('adminDashboardTest')">Run Test</button>
+        <div id="adminDashboardTestResult" class="test-result"></div>
+    </div>
+    
+    <div class="test-container">
+        <div class="test-title">Test 3: File Upload Integration</div>
+        <button onclick="runTest('fileUploadIntegrationTest')">Run Test</button>
+        <div id="fileUploadIntegrationTestResult" class="test-result"></div>
+    </div>
+    
+    <button onclick="runAllTests()">Run All Tests</button>
+    
+    <div class="log-container" id="logContainer">
+        <div class="log-entry">Test logs will appear here...</div>
+    </div>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    
+    <!-- Firebase Config -->
+    <script src="js/firebase-config-global.js"></script>
+    
+    <!-- Test Script -->
+    <script src="js/integration-tests.js"></script>
+    
+    <script>
+        // Override console.log to display in the log container
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        const logContainer = document.getElementById('logContainer');
+        
+        console.log = function() {
+            const args = Array.from(arguments);
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg) : arg
+            ).join(' ');
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.textContent = message;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            originalConsoleLog.apply(console, arguments);
+        };
+        
+        console.error = function() {
+            const args = Array.from(arguments);
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg) : arg
+            ).join(' ');
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.style.color = '#c62828';
+            logEntry.textContent = message;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            originalConsoleError.apply(console, arguments);
+        };
+        
+        // Run individual test
+        async function runTest(testName) {
+            const resultElement = document.getElementById(`${testName}Result`);
+            resultElement.textContent = 'Running test...';
+            resultElement.className = 'test-result';
+            
+            try {
+                let result;
+                switch (testName) {
+                    case 'formSubmissionTest':
+                        result = await window.integrationTests.testFormSubmission();
+                        break;
+                    case 'adminDashboardTest':
+                        result = await window.integrationTests.testAdminDashboard();
+                        break;
+                    case 'fileUploadIntegrationTest':
+                        result = await window.integrationTests.testFileUploadIntegration();
+                        break;
+                }
+                
+                if (result) {
+                    resultElement.textContent = 'Test passed!';
+                    resultElement.className = 'test-result success';
+                } else {
+                    resultElement.textContent = 'Test failed. Check logs for details.';
+                    resultElement.className = 'test-result error';
+                }
+            } catch (error) {
+                console.error(`Error running ${testName}:`, error);
+                resultElement.textContent = `Error: ${error.message}`;
+                resultElement.className = 'test-result error';
+            }
+        }
+        
+        // Run all tests
+        async function runAllTests() {
+            console.log('Running all tests...');
+            
+            // Clear previous results
+            document.getElementById('formSubmissionTestResult').textContent = '';
+            document.getElementById('adminDashboardTestResult').textContent = '';
+            document.getElementById('fileUploadIntegrationTestResult').textContent = '';
+            
+            const results = await window.integrationTests.runAllTests();
+            
+            // Update UI with results
+            if (results.formSubmissionTest) {
+                document.getElementById('formSubmissionTestResult').textContent = 'Test passed!';
+                document.getElementById('formSubmissionTestResult').className = 'test-result success';
+            } else {
+                document.getElementById('formSubmissionTestResult').textContent = 'Test failed. Check logs for details.';
+                document.getElementById('formSubmissionTestResult').className = 'test-result error';
+            }
+            
+            if (results.adminDashboardTest) {
+                document.getElementById('adminDashboardTestResult').textContent = 'Test passed!';
+                document.getElementById('adminDashboardTestResult').className = 'test-result success';
+            } else {
+                document.getElementById('adminDashboardTestResult').textContent = 'Test failed. Check logs for details.';
+                document.getElementById('adminDashboardTestResult').className = 'test-result error';
+            }
+            
+            if (results.fileUploadIntegrationTest) {
+                document.getElementById('fileUploadIntegrationTestResult').textContent = 'Test passed!';
+                document.getElementById('fileUploadIntegrationTestResult').className = 'test-result success';
+            } else {
+                document.getElementById('fileUploadIntegrationTestResult').textContent = 'Test failed. Check logs for details.';
+                document.getElementById('fileUploadIntegrationTestResult').className = 'test-result error';
+            }
+        }
+    </script>
+</body>
+</html>
