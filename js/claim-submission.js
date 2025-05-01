@@ -1,14 +1,14 @@
 // Claim Submission Module for Veterans Claims Assistance Portal
 // This module handles the submission of claims to Firebase
 
-import { 
-    database, 
-    storage, 
-    ref, 
-    push, 
-    set, 
-    storageRef, 
-    uploadBytesResumable, 
+import {
+    database,
+    storage,
+    ref,
+    push,
+    set,
+    storageRef,
+    uploadBytesResumable,
     getDownloadURL,
     generateId,
     encryptData
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Get form data
             const formData = new FormData(claimForm);
             const claimId = generateId();
-            
+
             // Basic claim data
             const claimData = {
                 id: claimId,
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     phone: claimData.phone,
                     claimDetails: claimData.claimDetails
                 };
-                
+
                 // Replace sensitive data with encrypted version
                 claimData.sensitiveData = encryptData(sensitiveData);
                 delete claimData.firstName;
@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (error) {
                 console.error('Error submitting claim:', error);
                 uploadStatus.textContent = 'Error: ' + error.message;
-                
+
                 setTimeout(() => {
                     uploadProgressModal.classList.add('hidden');
                     alert('An error occurred while submitting your claim. Please try again.');
@@ -148,27 +148,35 @@ document.addEventListener('DOMContentLoaded', function() {
             const fileExtension = file.name.split('.').pop();
             const fileName = `${fileId}.${fileExtension}`;
             const filePath = `claims/${claimId}/${category}/${fileName}`;
-            
+
             // Create a storage reference
             const fileRef = storageRef(storage, filePath);
-            
+
+            // Check file size before uploading
+            const fileSizeMB = file.size / (1024 * 1024);
+            if (fileSizeMB > 10) {
+                // Show warning for large files
+                uploadStatus.textContent = `Warning: ${file.name} is ${fileSizeMB.toFixed(2)}MB. Consider compressing large files.`;
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+
             // Upload file
             const uploadTask = uploadBytesResumable(fileRef, file);
-            
+
             // Wait for upload to complete
             await new Promise((resolve, reject) => {
-                uploadTask.on('state_changed', 
+                uploadTask.on('state_changed',
                     (snapshot) => {
                         // Calculate total progress across all files
                         const fileProgress = snapshot.bytesTransferred / snapshot.totalBytes;
                         const overallProgress = ((filesUploaded + fileProgress) / totalFiles) * 100;
-                        
+
                         // Update progress bar
                         uploadProgressBar.style.width = `${overallProgress}%`;
                         uploadProgressText.textContent = `${Math.round(overallProgress)}%`;
-                        
+
                         // Update status
-                        uploadStatus.textContent = `Uploading ${file.name} (${i+1}/${totalFiles})...`;
+                        uploadStatus.textContent = `Uploading ${file.name} (${i+1}/${totalFiles})... ${(fileProgress * 100).toFixed(0)}%`;
                     },
                     (error) => {
                         console.error('Error uploading file:', error);
@@ -177,10 +185,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     async () => {
                         // Upload completed successfully
                         filesUploaded++;
-                        
+
                         // Get download URL
                         const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-                        
+
                         // Add file metadata to array
                         uploadedFiles.push({
                             id: fileId,
@@ -192,13 +200,13 @@ document.addEventListener('DOMContentLoaded', function() {
                             url: downloadURL,
                             uploadDate: new Date().toISOString()
                         });
-                        
+
                         resolve();
                     }
                 );
             });
         }
-        
+
         return uploadedFiles;
     }
 
@@ -206,10 +214,10 @@ document.addEventListener('DOMContentLoaded', function() {
     async function saveClaimToFirebase(claimData) {
         // Create a new claim reference
         const claimsRef = ref(database, 'claims/' + claimData.id);
-        
+
         // Save the claim data
         await set(claimsRef, claimData);
-        
+
         // Also save to a list of claims by date for easier querying
         const claimsByDateRef = ref(database, 'claimsByDate/' + claimData.id);
         await set(claimsByDateRef, {
@@ -225,25 +233,25 @@ document.addEventListener('DOMContentLoaded', function() {
     function validateForm(formId) {
         const form = document.getElementById(formId);
         if (!form) return false;
-        
+
         let isValid = true;
         const requiredFields = form.querySelectorAll('[required]');
-        
+
         requiredFields.forEach(field => {
             if (!field.value.trim()) {
                 isValid = false;
                 field.classList.add('border-red-500');
-                
+
                 // Add error message if not already present
                 let errorMessage = field.dataset.errorMessage || 'This field is required';
                 let errorElement = field.parentElement.querySelector('.error-message');
-                
+
                 if (!errorElement) {
                     errorElement = document.createElement('p');
                     errorElement.className = 'text-red-500 text-xs mt-1 error-message';
                     field.parentElement.appendChild(errorElement);
                 }
-                
+
                 errorElement.textContent = errorMessage;
             } else {
                 field.classList.remove('border-red-500');
@@ -253,7 +261,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
-        
+
         return isValid;
     }
 });

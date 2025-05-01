@@ -1,4 +1,16 @@
 // Admin Dashboard JavaScript for Veterans Claims Assistance Portal
+import {
+    database,
+    storage,
+    ref,
+    get,
+    child,
+    update,
+    storageRef,
+    getDownloadURL,
+    decryptData,
+    formatFileSize
+} from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     // DOM elements - Login
@@ -94,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize
     init();
 
-    function init() {
+    async function init() {
         // Set current date
         if (currentDate) {
             currentDate.textContent = new Date().toLocaleDateString('en-US', {
@@ -110,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isLoggedIn && loginContainer && adminDashboard) {
             loginContainer.classList.add('hidden');
             adminDashboard.classList.remove('hidden');
-            initDashboard();
+            await initDashboard();
         }
 
         // Setup event listeners
@@ -134,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Handle login form submission
         if (loginForm) {
-            loginForm.addEventListener('submit', function(e) {
+            loginForm.addEventListener('submit', async function(e) {
                 e.preventDefault();
 
                 const email = document.getElementById('adminEmail').value;
@@ -147,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     adminDashboard.classList.remove('hidden');
 
                     // Initialize dashboard
-                    initDashboard();
+                    await initDashboard();
                 } else {
                     // Login failed
                     if (loginError) {
@@ -382,9 +394,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Initialize dashboard
-    function initDashboard() {
-        // Load claims data
-        loadAllClaims();
+    async function initDashboard() {
+        // Load claims data from Firebase
+        await loadAllClaims();
 
         // Load dashboard stats
         loadDashboardStats();
@@ -396,19 +408,36 @@ document.addEventListener('DOMContentLoaded', function() {
         loadRecentClaims();
     }
 
-    // Load all claims from localStorage
-    function loadAllClaims() {
-        allClaims = JSON.parse(localStorage.getItem('veteranClaims')) || [];
+    // Load all claims from Firebase
+    async function loadAllClaims() {
+        try {
+            const claimsRef = ref(database, 'claims');
+            const snapshot = await get(claimsRef);
 
-        // Sort claims by date (newest first)
-        allClaims.sort((a, b) => new Date(b.date) - new Date(a.date));
+            if (snapshot.exists()) {
+                allClaims = [];
+                snapshot.forEach((childSnapshot) => {
+                    allClaims.push(childSnapshot.val());
+                });
+
+                // Sort claims by date (newest first)
+                allClaims.sort((a, b) => new Date(b.date) - new Date(a.date));
+            } else {
+                allClaims = [];
+                console.log('No claims found in Firebase');
+            }
+        } catch (error) {
+            console.error('Error loading claims from Firebase:', error);
+            allClaims = [];
+        }
     }
 
     // Load dashboard stats
     function loadDashboardStats() {
         if (!totalClaimsCount) return;
 
-        const claims = allClaims.length > 0 ? allClaims : JSON.parse(localStorage.getItem('veteranClaims')) || [];
+        // Use the allClaims array that's loaded from Firebase
+        const claims = allClaims;
 
         // Count claims by status
         const newCount = claims.filter(claim => claim.status === 'new').length;
@@ -441,7 +470,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadRecentClaims() {
         if (!recentClaimsTableBody) return;
 
-        const claims = allClaims.length > 0 ? allClaims : JSON.parse(localStorage.getItem('veteranClaims')) || [];
+        // Use the allClaims array that's loaded from Firebase
+        const claims = allClaims;
 
         // Clear table
         recentClaimsTableBody.innerHTML = '';
@@ -461,9 +491,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const dateObj = new Date(claim.date);
             const formattedDate = dateObj.toLocaleDateString();
 
+            // Decrypt sensitive data
+            const sensitiveData = claim.sensitiveData ? decryptData(claim.sensitiveData) : {};
+            const firstName = sensitiveData.firstName || '';
+            const lastName = sensitiveData.lastName || '';
+
             row.innerHTML = `
                 <td>${formattedDate}</td>
-                <td>${claim.firstName} ${claim.lastName}</td>
+                <td>${firstName} ${lastName}</td>
                 <td>${claim.claimType}</td>
                 <td><span class="admin-badge ${getStatusBadgeClass(claim.status)}">${getStatusLabel(claim.status)}</span></td>
                 <td>
@@ -840,12 +875,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Load claims from localStorage
+    // Load claims from Firebase
     function loadClaims(filter = 'all') {
         if (!claimsTableBody) return;
 
-        // Get claims from localStorage
-        const claims = allClaims.length > 0 ? allClaims : JSON.parse(localStorage.getItem('veteranClaims')) || [];
+        // Use the allClaims array that's loaded from Firebase
+        const claims = allClaims;
 
         // Filter claims if needed
         const filteredClaims = filter === 'all'
@@ -871,12 +906,17 @@ document.addEventListener('DOMContentLoaded', function() {
             const dateObj = new Date(claim.date);
             const formattedDate = dateObj.toLocaleDateString();
 
+            // Decrypt sensitive data
+            const sensitiveData = claim.sensitiveData ? decryptData(claim.sensitiveData) : {};
+            const firstName = sensitiveData.firstName || '';
+            const lastName = sensitiveData.lastName || '';
+
             row.innerHTML = `
                 <td>
                     <input type="checkbox" class="claim-checkbox mr-2" data-id="${claim.id}">
                     ${formattedDate}
                 </td>
-                <td>${claim.firstName} ${claim.lastName}</td>
+                <td>${firstName} ${lastName}</td>
                 <td>${claim.branch || 'Not specified'}</td>
                 <td>${claim.claimType}</td>
                 <td><span class="admin-badge ${getStatusBadgeClass(claim.status)}">${getStatusLabel(claim.status)}</span></td>
@@ -913,18 +953,26 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        const claims = allClaims.length > 0 ? allClaims : JSON.parse(localStorage.getItem('veteranClaims')) || [];
+        // Use the allClaims array that's loaded from Firebase
+        const claims = allClaims;
 
         // Filter claims by search term
         const filteredClaims = claims.filter(claim => {
-            const fullName = `${claim.firstName} ${claim.lastName}`.toLowerCase();
-            const email = claim.email.toLowerCase();
+            // Decrypt sensitive data
+            const sensitiveData = claim.sensitiveData ? decryptData(claim.sensitiveData) : {};
+            const firstName = sensitiveData.firstName || '';
+            const lastName = sensitiveData.lastName || '';
+            const email = sensitiveData.email || '';
+            const claimDetails = sensitiveData.claimDetails || '';
+
+            const fullName = `${firstName} ${lastName}`.toLowerCase();
+            const emailLower = email.toLowerCase();
             const claimType = claim.claimType.toLowerCase();
             const branch = (claim.branch || '').toLowerCase();
-            const details = claim.claimDetails.toLowerCase();
+            const details = claimDetails.toLowerCase();
 
             return fullName.includes(searchTerm) ||
-                   email.includes(searchTerm) ||
+                   emailLower.includes(searchTerm) ||
                    claimType.includes(searchTerm) ||
                    branch.includes(searchTerm) ||
                    details.includes(searchTerm);
@@ -952,12 +1000,17 @@ document.addEventListener('DOMContentLoaded', function() {
             const dateObj = new Date(claim.date);
             const formattedDate = dateObj.toLocaleDateString();
 
+            // Decrypt sensitive data
+            const sensitiveData = claim.sensitiveData ? decryptData(claim.sensitiveData) : {};
+            const firstName = sensitiveData.firstName || '';
+            const lastName = sensitiveData.lastName || '';
+
             row.innerHTML = `
                 <td>
                     <input type="checkbox" class="claim-checkbox mr-2" data-id="${claim.id}">
                     ${formattedDate}
                 </td>
-                <td>${claim.firstName} ${claim.lastName}</td>
+                <td>${firstName} ${lastName}</td>
                 <td>${claim.branch || 'Not specified'}</td>
                 <td>${claim.claimType}</td>
                 <td><span class="admin-badge ${getStatusBadgeClass(claim.status)}">${getStatusLabel(claim.status)}</span></td>
@@ -1002,42 +1055,56 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // View claim details
-    function viewClaimDetails(claimId) {
-        const claims = allClaims.length > 0 ? allClaims : JSON.parse(localStorage.getItem('veteranClaims')) || [];
-        const claim = claims.find(c => c.id === claimId);
+    async function viewClaimDetails(claimId) {
+        try {
+            // Get claim from Firebase
+            const claimRef = ref(database, `claims/${claimId}`);
+            const snapshot = await get(claimRef);
 
-        if (!claim) return;
+            if (!snapshot.exists()) {
+                console.error('Claim not found in Firebase');
+                return;
+            }
 
-        // Set current claim ID
-        currentClaimId = claimId;
+            const claim = snapshot.val();
 
-        // Set status dropdown to current status
-        if (statusUpdate) {
-            statusUpdate.value = claim.status;
+            // Set current claim ID
+            currentClaimId = claimId;
+
+            // Set status dropdown to current status
+            if (statusUpdate) {
+                statusUpdate.value = claim.status;
+            }
+
+            // Format dates
+            const submissionDate = new Date(claim.date).toLocaleString();
+
+            // Decrypt sensitive data
+            const sensitiveData = claim.sensitiveData ? decryptData(claim.sensitiveData) : {};
+
+            // Populate claim details
+            if (claimId) claimId.textContent = claim.id;
+            if (claimDate) claimDate.textContent = submissionDate;
+            if (claimStatus) claimStatus.textContent = getStatusLabel(claim.status);
+            if (veteranName) veteranName.textContent = `${sensitiveData.firstName || ''} ${sensitiveData.lastName || ''}`;
+            if (veteranEmail) veteranEmail.textContent = sensitiveData.email || '';
+            if (veteranPhone) veteranPhone.textContent = sensitiveData.phone || 'Not provided';
+            if (veteranBranch) veteranBranch.textContent = claim.branch || 'Not specified';
+            if (claimType) claimType.textContent = claim.claimType;
+            if (claimDetails) claimDetails.textContent = sensitiveData.claimDetails || '';
+
+            // Load documents
+            loadDocuments(claim);
+
+            // Load notes history
+            loadNotesHistory(claimId);
+
+            // Show modal
+            claimModal.classList.add('show');
+        } catch (error) {
+            console.error('Error viewing claim details:', error);
+            alert('Error loading claim details. Please try again.');
         }
-
-        // Format dates
-        const submissionDate = new Date(claim.date).toLocaleString();
-
-        // Populate claim details
-        if (claimId) claimId.textContent = claim.id;
-        if (claimDate) claimDate.textContent = submissionDate;
-        if (claimStatus) claimStatus.textContent = getStatusLabel(claim.status);
-        if (veteranName) veteranName.textContent = `${claim.firstName} ${claim.lastName}`;
-        if (veteranEmail) veteranEmail.textContent = claim.email;
-        if (veteranPhone) veteranPhone.textContent = claim.phone || 'Not provided';
-        if (veteranBranch) veteranBranch.textContent = claim.branch || 'Not specified';
-        if (claimType) claimType.textContent = claim.claimType;
-        if (claimDetails) claimDetails.textContent = claim.claimDetails;
-
-        // Load documents
-        loadDocuments(claim);
-
-        // Load notes history
-        loadNotesHistory(claimId);
-
-        // Show modal
-        claimModal.classList.add('show');
     }
 
     // Load documents
@@ -1128,42 +1195,59 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Load notes history
-    function loadNotesHistory(claimId) {
+    async function loadNotesHistory(claimId) {
         if (!notesHistory) return;
 
-        const claims = JSON.parse(localStorage.getItem('veteranClaims')) || [];
-        const claim = claims.find(c => c.id === claimId);
+        try {
+            // Get claim from Firebase
+            const claimRef = ref(database, `claims/${claimId}`);
+            const snapshot = await get(claimRef);
 
-        if (!claim) return;
+            if (!snapshot.exists()) {
+                console.error('Claim not found in Firebase');
+                return;
+            }
 
-        // Clear notes history
-        notesHistory.innerHTML = '';
+            const claim = snapshot.val();
 
-        // Check if notes exist
-        if (claim.notes && claim.notes.length > 0) {
-            // Sort notes by date (newest first)
-            claim.notes.sort((a, b) => new Date(b.date) - new Date(a.date));
+            // Clear notes history
+            notesHistory.innerHTML = '';
 
-            // Populate notes
-            claim.notes.forEach(note => {
-                const noteDiv = document.createElement('div');
-                noteDiv.className = 'p-3 bg-gray-50 rounded mb-3';
+            // Check if notes exist
+            if (claim.notes && claim.notes.length > 0) {
+                // Sort notes by date (newest first)
+                claim.notes.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-                const noteDate = new Date(note.date).toLocaleString();
+                // Populate notes
+                claim.notes.forEach(note => {
+                    const noteDiv = document.createElement('div');
+                    noteDiv.className = 'p-3 bg-gray-50 rounded mb-3';
 
-                noteDiv.innerHTML = `
-                    <p class="mb-1">${note.text}</p>
-                    <p class="text-xs text-gray-500">${noteDate}</p>
-                `;
+                    const noteDate = new Date(note.date).toLocaleString();
 
-                notesHistory.appendChild(noteDiv);
-            });
-        } else {
-            // No notes
-            const noNotes = document.createElement('p');
-            noNotes.className = 'text-gray-500 text-sm italic';
-            noNotes.textContent = 'No notes have been added yet.';
-            notesHistory.appendChild(noNotes);
+                    noteDiv.innerHTML = `
+                        <p class="mb-1">${note.text}</p>
+                        <p class="text-xs text-gray-500">${noteDate}</p>
+                    `;
+
+                    notesHistory.appendChild(noteDiv);
+                });
+            } else {
+                // No notes
+                const noNotes = document.createElement('p');
+                noNotes.className = 'text-gray-500 text-sm italic';
+                noNotes.textContent = 'No notes have been added yet.';
+                notesHistory.appendChild(noNotes);
+            }
+        } catch (error) {
+            console.error('Error loading notes history:', error);
+
+            // Show error message
+            notesHistory.innerHTML = '';
+            const errorMsg = document.createElement('p');
+            errorMsg.className = 'text-red-500 text-sm italic';
+            errorMsg.textContent = 'Error loading notes. Please try again.';
+            notesHistory.appendChild(errorMsg);
         }
     }
 
@@ -1470,50 +1554,95 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Update claim status
-    function updateClaimStatus(claimId, newStatus) {
-        const claims = JSON.parse(localStorage.getItem('veteranClaims')) || [];
-        const claimIndex = claims.findIndex(c => c.id === claimId);
+    async function updateClaimStatus(claimId, newStatus) {
+        try {
+            // Get current claim data from Firebase
+            const claimRef = ref(database, `claims/${claimId}`);
+            const snapshot = await get(claimRef);
 
-        if (claimIndex !== -1) {
-            const oldStatus = claims[claimIndex].status;
-            claims[claimIndex].status = newStatus;
-
-            // Add a note about the status change
-            if (!claims[claimIndex].notes) {
-                claims[claimIndex].notes = [];
+            if (!snapshot.exists()) {
+                console.error('Claim not found in Firebase');
+                return;
             }
 
-            claims[claimIndex].notes.push({
-                text: `Status changed from ${getStatusLabel(oldStatus)} to ${getStatusLabel(newStatus)}`,
-                date: new Date().toISOString()
-            });
+            const claim = snapshot.val();
+            const currentStatus = claim.status;
 
-            localStorage.setItem('veteranClaims', JSON.stringify(claims));
+            // Only update if status has changed
+            if (newStatus !== currentStatus) {
+                // Add a note about the status change
+                const note = {
+                    date: new Date().toISOString(),
+                    text: `Status changed from ${getStatusLabel(currentStatus)} to ${getStatusLabel(newStatus)}`,
+                    status: newStatus
+                };
 
-            // Refresh data
-            loadAllClaims();
+                // Add note to claim
+                const notes = claim.notes || [];
+                notes.push(note);
+
+                // Update claim in Firebase
+                await update(claimRef, {
+                    status: newStatus,
+                    notes: notes,
+                    lastUpdated: new Date().toISOString()
+                });
+
+                // Also update in claimsByDate
+                const claimsByDateRef = ref(database, `claimsByDate/${claimId}`);
+                await update(claimsByDateRef, {
+                    status: newStatus
+                });
+
+                // Reload claims
+                await loadAllClaims();
+                loadDashboardStats();
+                loadRecentClaims();
+
+                // Show success message
+                alert('Claim status updated successfully.');
+            }
+        } catch (error) {
+            console.error('Error updating claim status:', error);
+            alert('Error updating claim status. Please try again.');
         }
     }
 
     // Add note to claim
-    function addNoteToClaimId(claimId, noteText) {
-        const claims = JSON.parse(localStorage.getItem('veteranClaims')) || [];
-        const claimIndex = claims.findIndex(c => c.id === claimId);
+    async function addNoteToClaimId(claimId, noteText) {
+        try {
+            // Get current claim data from Firebase
+            const claimRef = ref(database, `claims/${claimId}`);
+            const snapshot = await get(claimRef);
 
-        if (claimIndex !== -1) {
-            if (!claims[claimIndex].notes) {
-                claims[claimIndex].notes = [];
+            if (!snapshot.exists()) {
+                console.error('Claim not found in Firebase');
+                return;
             }
 
-            claims[claimIndex].notes.push({
+            const claim = snapshot.val();
+
+            // Add note to claim
+            const notes = claim.notes || [];
+            notes.push({
                 text: noteText,
                 date: new Date().toISOString()
             });
 
-            localStorage.setItem('veteranClaims', JSON.stringify(claims));
+            // Update claim in Firebase
+            await update(claimRef, {
+                notes: notes,
+                lastUpdated: new Date().toISOString()
+            });
 
-            // Refresh data
-            loadAllClaims();
+            // Reload notes history
+            loadNotesHistory(claimId);
+
+            // Show success message
+            alert('Note added successfully.');
+        } catch (error) {
+            console.error('Error adding note:', error);
+            alert('Error adding note. Please try again.');
         }
     }
 

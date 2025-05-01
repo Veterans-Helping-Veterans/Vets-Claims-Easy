@@ -10,15 +10,19 @@ import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, de
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyDVMxJ-iBn9ylnUUWR_Dn0NWxNdg2WFxTY",
+  apiKey: "AIzaSyFyaNXfzAG2JBDSTpMcbmTTwk3Twg",
   authDomain: "vets-claims-easy.firebaseapp.com",
   projectId: "vets-claims-easy",
   storageBucket: "vets-claims-easy.appspot.com",
-  messagingSenderId: "1098765432",
-  appId: "1:1098765432:web:abc123def456ghi789jkl",
-  measurementId: "G-ABCDEFGHIJ",
+  messagingSenderId: "422934662221",
+  appId: "1:422934662221:web:bc6b8f6dafa9af73b784",
+  measurementId: "G-PVPX2CXDL",
   databaseURL: "https://vets-claims-easy-default-rtdb.firebaseio.com"
 };
+
+// Add GitHub Pages domain to authorized domains
+// Note: You must also add this domain in the Firebase Console under Authentication > Settings > Authorized Domains
+// Domain to add: veterans-helping-veterans.github.io
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -27,22 +31,22 @@ const database = getDatabase(app);
 const storage = getStorage(app);
 
 // Export the Firebase services
-export { 
-  app, 
-  auth, 
-  database, 
-  storage, 
-  ref, 
-  set, 
-  get, 
-  child, 
-  push, 
-  update, 
-  remove, 
-  query, 
+export {
+  app,
+  auth,
+  database,
+  storage,
+  ref,
+  set,
+  get,
+  child,
+  push,
+  update,
+  remove,
+  query,
   orderByChild,
-  signInWithEmailAndPassword, 
-  onAuthStateChanged, 
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
   signOut,
   storageRef,
   uploadBytesResumable,
