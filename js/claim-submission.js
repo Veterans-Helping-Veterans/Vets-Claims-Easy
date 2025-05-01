@@ -1,18 +1,12 @@
 // Claim Submission Module for Veterans Claims Assistance Portal
-// This module handles the submission of claims to Firebase
+// This module handles the submission of claims to local storage
 
 import {
-    database,
-    storage,
-    ref,
-    push,
-    set,
-    storageRef,
-    uploadBytesResumable,
-    getDownloadURL,
     generateId,
-    encryptData
-} from './firebase-config.js';
+    encryptData,
+    saveClaimData,
+    uploadFile
+} from './local-storage-service.js';
 
 document.addEventListener('DOMContentLoaded', function() {
     // DOM elements
@@ -107,9 +101,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 delete claimData.phone;
                 delete claimData.claimDetails;
 
-                // Save claim data to Firebase
+                // Save claim data to local storage
                 uploadStatus.textContent = 'Saving claim data...';
-                await saveClaimToFirebase(claimData);
+                const saveResult = await saveClaimData(claimData);
 
                 // Update progress
                 uploadProgressBar.style.width = '100%';
@@ -136,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Function to upload files to Firebase Storage
+    // Function to upload files to local storage
     async function uploadFiles(files, claimId, category) {
         const uploadedFiles = [];
         let totalFiles = files.length;
@@ -144,13 +138,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
-            const fileId = generateId();
-            const fileExtension = file.name.split('.').pop();
-            const fileName = `${fileId}.${fileExtension}`;
-            const filePath = `claims/${claimId}/${category}/${fileName}`;
-
-            // Create a storage reference
-            const fileRef = storageRef(storage, filePath);
 
             // Check file size before uploading
             const fileSizeMB = file.size / (1024 * 1024);
@@ -160,73 +147,48 @@ document.addEventListener('DOMContentLoaded', function() {
                 await new Promise(resolve => setTimeout(resolve, 2000));
             }
 
-            // Upload file
-            const uploadTask = uploadBytesResumable(fileRef, file);
+            // Update status
+            uploadStatus.textContent = `Uploading ${file.name} (${i+1}/${totalFiles})...`;
 
-            // Wait for upload to complete
-            await new Promise((resolve, reject) => {
-                uploadTask.on('state_changed',
-                    (snapshot) => {
-                        // Calculate total progress across all files
-                        const fileProgress = snapshot.bytesTransferred / snapshot.totalBytes;
-                        const overallProgress = ((filesUploaded + fileProgress) / totalFiles) * 100;
+            try {
+                // Upload file using the local storage service
+                const result = await uploadFile(file, claimId, category);
 
-                        // Update progress bar
-                        uploadProgressBar.style.width = `${overallProgress}%`;
-                        uploadProgressText.textContent = `${Math.round(overallProgress)}%`;
+                if (result.success) {
+                    // Upload completed successfully
+                    filesUploaded++;
 
-                        // Update status
-                        uploadStatus.textContent = `Uploading ${file.name} (${i+1}/${totalFiles})... ${(fileProgress * 100).toFixed(0)}%`;
-                    },
-                    (error) => {
-                        console.error('Error uploading file:', error);
-                        reject(error);
-                    },
-                    async () => {
-                        // Upload completed successfully
-                        filesUploaded++;
+                    // Calculate progress
+                    const overallProgress = (filesUploaded / totalFiles) * 100;
 
-                        // Get download URL
-                        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                    // Update progress bar
+                    uploadProgressBar.style.width = `${overallProgress}%`;
+                    uploadProgressText.textContent = `${Math.round(overallProgress)}%`;
 
-                        // Add file metadata to array
-                        uploadedFiles.push({
-                            id: fileId,
-                            name: file.name,
-                            originalName: file.name,
-                            size: file.size,
-                            type: file.type,
-                            path: filePath,
-                            url: downloadURL,
-                            uploadDate: new Date().toISOString()
-                        });
-
-                        resolve();
-                    }
-                );
-            });
+                    // Add file metadata to array
+                    uploadedFiles.push({
+                        id: result.fileId,
+                        name: file.name,
+                        originalName: file.name,
+                        size: file.size,
+                        type: file.type,
+                        path: result.fileUrl || '',
+                        url: result.fileUrl || '',
+                        uploadDate: new Date().toISOString()
+                    });
+                } else {
+                    console.error('Error uploading file:', result.message);
+                    uploadStatus.textContent = `Error uploading ${file.name}: ${result.message}`;
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+            } catch (error) {
+                console.error('Error uploading file:', error);
+                uploadStatus.textContent = `Error uploading ${file.name}: ${error.message}`;
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
         }
 
         return uploadedFiles;
-    }
-
-    // Function to save claim data to Firebase
-    async function saveClaimToFirebase(claimData) {
-        // Create a new claim reference
-        const claimsRef = ref(database, 'claims/' + claimData.id);
-
-        // Save the claim data
-        await set(claimsRef, claimData);
-
-        // Also save to a list of claims by date for easier querying
-        const claimsByDateRef = ref(database, 'claimsByDate/' + claimData.id);
-        await set(claimsByDateRef, {
-            id: claimData.id,
-            date: claimData.date,
-            status: claimData.status,
-            branch: claimData.branch,
-            claimType: claimData.claimType
-        });
     }
 
     // Function to validate form
