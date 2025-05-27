@@ -1,0 +1,74 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+/* Custom styles for Veterans Claims Assistance Portal */
+
+/* Custom colors */
+:root {
+    --military-green: #4b5320;
+    --military-tan: #b5a642;
+    --military-brown: #8b4513;
+    --military-gray: #5a5a5a;
+}
+
+/* Custom focus styles */
+*:focus {
+    outline: 2px solid var(--military-green);
+    outline-offset: 2px;
+}
+
+/* Header and navigation styles */
+header {
+    background-color: var(--military-green) !important;
+}
+
+/* Button styles */
+.btn-primary {
+    background-color: var(--military-green) !important;
+    border-color: var(--military-green) !important;
+}
+
+.btn-primary:hover {
+    background-color: #3a4119 !important;
+    border-color: #3a4119 !important;
+}
+
+/* Form styles */
+.form-control:focus {
+    border-color: var(--military-green);
+    box-shadow: 0 0 0 0.2rem rgba(75, 83, 32, 0.25);
+}
+
+/* Custom card styles */
+.card {
+    border-color: var(--military-tan);
+}
+
+.card-header {
+    background-color: var(--military-tan);
+    color: white;
+}
+
+/* Status badges */
+.status-new {
+    background-color: #f0ad4e;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.status-in-progress {
+    background-color: #5bc0de;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}
+
+.status-completed {
+    background-color: #5cb85c;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+}

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Claim Request - Veterans Claims Assistance Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-gray-100">
+    <header class="bg-green-800 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="/Vets-Claims-Easy/images/company-logo.png" alt="Veterans Claims Logo" class="h-20 mr-3">
+                <h1 class="text-2xl font-bold">Veterans Claims Assistance Portal</h1>
+            </div>
+            <nav>
+                <ul class="flex space-x-4">
+                    <li><a href="index.html" class="hover:underline">Home</a></li>
+                    <li><a href="index.html#about" class="hover:underline">About</a></li>
+                    <li><a href="index.html#services" class="hover:underline">Services</a></li>
+                    <li><a href="claim-form.html" class="hover:underline">Submit Claim</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4">
+        <section class="bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-2xl font-bold mb-4 text-green-800">Submit a Claim Assistance Request</h2>
+            <p class="mb-6">
+                Please fill out the form below to request assistance with your VA claim.
+                All information provided is kept confidential and will only be used to help with your claim.
+            </p>
+
+            <!-- Progress Bar -->
+            <div class="mb-8">
+                <div class="relative pt-1">
+                    <div class="flex mb-2 items-center justify-between">
+                        <div>
+                            <span id="progress-text" class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-white bg-green-700">
+                                Step 1 of 4
+                            </span>
+                        </div>
+                        <div class="text-right">
+                            <span id="progress-percentage" class="text-xs font-semibold inline-block text-green-700">
+                                25%
+                            </span>
+                        </div>
+                    </div>
+                    <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-green-200">
+                        <div id="progress-bar" style="width: 25%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-700 transition-all duration-500"></div>
+                    </div>
+                </div>
+            </div>
+
+            <form id="claimForm" class="space-y-4">
+                <!-- Step 1: Personal Information -->
+                <div id="step-1" class="form-step">
+                    <h3 class="text-xl font-bold mb-4 text-green-800 border-b pb-2">Personal Information</h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="firstName" class="block text-gray-700 font-bold mb-2">First Name <span class="text-red-500">*</span></label>
+                            <input type="text" id="firstName" name="firstName" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <p class="error-message text-red-500 text-sm mt-1 hidden"></p>
+                        </div>
+                        <div>
+                            <label for="lastName" class="block text-gray-700 font-bold mb-2">Last Name <span class="text-red-500">*</span></label>
+                            <input type="text" id="lastName" name="lastName" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <p class="error-message text-red-500 text-sm mt-1 hidden"></p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <label for="email" class="block text-gray-700 font-bold mb-2">Email Address <span class="text-red-500">*</span></label>
+                        <input type="email" id="email" name="email" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                        <p class="error-message text-red-500 text-sm mt-1 hidden"></p>
+                    </div>
+
+                    <div class="mt-4">
+                        <label for="phone" class="block text-gray-700 font-bold mb-2">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" placeholder="(123) 456-7890"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                        <p class="error-message text-red-500 text-sm mt-1 hidden"></p>
+                    </div>
+
+                    <div class="flex justify-end mt-6">
+                        <button type="button" id="next-1" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-6 rounded flex items-center">
+                            Next Step <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Military Service Details -->
+                <div id="step-2" class="form-step hidden">
+                    <h3 class="text-xl font-bold mb-4 text-green-800 border-b pb-2">Military Service Details</h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div>
+                            <label for="branch" class="block text-gray-700 font-bold mb-2">Branch <span class="text-red-500">*</span></label>
+                            <select id="branch" name="branch" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                                <option value="">Select Branch</option>
+                                <option value="Army">Army</option>
+                                <option value="Navy">Navy</option>
+                                <option value="Air Force">Air Force</option>
+                                <option value="Marines">Marines</option>
+                                <option value="Space Force">Space Force</option>
+                            </select>
+                            <p class="error-message text-red-500 text-sm mt-1 hidden"></p>
+                        </div>
+                        <div>
+                            <label for="serviceStart" class="block text-gray-700 font-bold mb-2">Service Start <span class="text-red-500">*</span></label>
+                            <input type="date" id="serviceStart" name="serviceStart" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <p class="error-message text-red-500 text-sm mt-1 hidden"></p>
+                        </div>
+                        <div>
+                            <label for="serviceEnd" class="block text-gray-700 font-bold mb-2">Service End</label>
+                            <input type="date" id="serviceEnd" name="serviceEnd"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <p class="text-sm text-gray-500 mt-1">Leave blank if still serving</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <label for="rank" class="block text-gray-700 font-bold mb-2">Highest Rank Achieved</label>
+                        <input type="text" id="rank" name="rank"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                    </div>
+
+                    <div class="mt-4">
+                        <label for="dischargeType" class="block text-gray-700 font-bold mb-2">Discharge Type</label>
+                        <select id="dischargeType" name="dischargeType"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <option value="">Select Discharge Type</option>
+                            <option value="Honorable">Honorable</option>
+                            <option value="General">General (Under Honorable Conditions)</option>
+                            <option value="OTH">Other Than Honorable</option>
+                            <option value="Bad Conduct">Bad Conduct</option>
+                            <option value="Dishonorable">Dishonorable</option>
+                            <option value="Entry Level Separation">Entry Level Separation</option>
+                            <option value="Still Serving">Still Serving</option>
+                        </select>
+                    </div>
+
+                    <div class="flex justify-between mt-6">
+                        <button type="button" id="prev-2" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                            </svg> Previous
+                        </button>
+                        <button type="button" id="next-2" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-6 rounded flex items-center">
+                            Next Step <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Claim Information -->
+                <div id="step-3" class="form-step hidden">
+                    <h3 class="text-xl font-bold mb-4 text-green-800 border-b pb-2">Claim Information</h3>
+
+                    <div>
+                        <label for="claimType" class="block text-gray-700 font-bold mb-2">Type of Claim <span class="text-red-500">*</span></label>
+                        <select id="claimType" name="claimType" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                            <option value="">Select Claim Type</option>
+                            <option value="Initial">Initial Claim</option>
+                            <option value="Increase">Increase Existing Rating</option>
+                            <option value="Appeal">Appeal Denied Claim</option>
+                            <option value="Supplemental">Supplemental Claim</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <p class="error-message text-red-500 text-sm mt-1 hidden"></p>
+                    </div>
+
+                    <div id="rating-container" class="mt-4 hidden">
+                        <label for="currentRating" class="block text-gray-700 font-bold mb-2">Current Disability Rating (%)</label>
+                        <input type="number" id="currentRating" name="currentRating" min="0" max="100"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600">
+                    </div>
+
+                    <div id="conditions-container" class="mt-4">
+                        <label class="block text-gray-700 font-bold mb-2">Conditions (Select all that apply)</label>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="ptsd" name="conditions[]" value="PTSD" class="h-4 w-4 text-green-600">
+                                <label for="ptsd" class="ml-2 block text-gray-700">PTSD</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="hearing" name="conditions[]" value="Hearing Loss" class="h-4 w-4 text-green-600">
+                                <label for="hearing" class="ml-2 block text-gray-700">Hearing Loss/Tinnitus</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="back" name="conditions[]" value="Back Injury" class="h-4 w-4 text-green-600">
+                                <label for="back" class="ml-2 block text-gray-700">Back Injury</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="knee" name="conditions[]" value="Knee Injury" class="h-4 w-4 text-green-600">
+                                <label for="knee" class="ml-2 block text-gray-700">Knee Injury</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="agent" name="conditions[]" value="Agent Orange" class="h-4 w-4 text-green-600">
+                                <label for="agent" class="ml-2 block text-gray-700">Agent Orange Exposure</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="other-condition" name="conditions[]" value="Other" class="h-4 w-4 text-green-600">
+                                <label for="other-condition" class="ml-2 block text-gray-700">Other</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <label for="claimDetails" class="block text-gray-700 font-bold mb-2">Claim Details <span class="text-red-500">*</span></label>
+                        <textarea id="claimDetails" name="claimDetails" rows="5" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600"
+                            placeholder="Please describe your claim and the assistance you need..."></textarea>
+                        <p class="error-message text-red-500 text-sm mt-1 hidden"></p>
+                    </div>
+
+                    <div class="flex justify-between mt-6">
+                        <button type="button" id="prev-3" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                            </svg> Previous
+                        </button>
+                        <button type="button" id="next-3" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-6 rounded flex items-center">
+                            Next Step <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Documents and Submission -->
+                <div id="step-4" class="form-step hidden">
+                    <h3 class="text-xl font-bold mb-4 text-green-800 border-b pb-2">Documents and Submission</h3>
+
+                    <div>
+                        <label class="block text-gray-700 font-bold mb-2">Upload Documents (Optional)</label>
+                        <p class="text-sm text-gray-600 mb-2">You can upload medical records, VA letters, or other relevant documents.</p>
+
+                        <div id="dropzone" class="border-2 border-dashed border-green-400 rounded-lg p-6 text-center cursor-pointer hover:bg-green-50 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-green-700 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                            </svg>
+                            <p class="text-gray-700 mb-1">Drag and drop files here, or click to select files</p>
+                            <p class="text-xs text-gray-500">Supported formats: PDF, JPG, PNG, DOC, DOCX (Max 10MB per file)</p>
+                        </div>
+                        <input type="file" id="fileUpload" name="fileUpload" multiple class="hidden">
+
+                        <div id="file-preview" class="mt-4 space-y-2"></div>
+                    </div>
+
+                    <div class="mt-6 p-4 bg-gray-100 rounded-lg">
+                        <div class="flex items-start">
+                            <input type="checkbox" id="consent" name="consent" required class="h-4 w-4 text-green-600 mt-1">
+                            <label for="consent" class="ml-2 block text-gray-700">
+                                <span class="font-bold">Consent and Privacy Agreement <span class="text-red-500">*</span></span><br>
+                                <span class="text-sm">
+                                    I consent to having my information stored and processed for the purpose of assisting with my VA claim.
+                                    I understand that my personal information will be handled in accordance with privacy laws and will only
+                                    be used to assist with my claim.
+                                </span>
+                            </label>
+                        </div>
+                        <p class="error-message text-red-500 text-sm mt-1 hidden"></p>
+                    </div>
+
+                    <div class="mt-6 p-4 bg-green-50 rounded-lg">
+                        <h4 class="font-bold text-green-800 mb-2">Review Your Information</h4>
+                        <p class="text-sm text-gray-700 mb-4">
+                            Please review all the information you've provided before submitting your claim request.
+                            You can go back to previous steps to make changes if needed.
+                        </p>
+                        <div id="review-summary" class="text-sm space-y-2">
+                            <!-- This will be populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between mt-6">
+                        <button type="button" id="prev-4" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                            </svg> Previous
+                        </button>
+                        <button type="submit" id="submit-form" class="bg-green-700 hover:bg-green-800 text-white font-bold py-2 px-6 rounded flex items-center">
+                            Submit Claim Request <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5 10a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1z" clip-rule="evenodd" />
+                                <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v8a1 1 0 11-2 0V6a1 1 0 011-1z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <footer class="bg-green-800 text-white p-4 mt-6">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2023 Veterans Claims Assistance Portal. All rights reserved.</p>
+            <p class="text-sm mt-2">This service is not affiliated with the Department of Veterans Affairs.</p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

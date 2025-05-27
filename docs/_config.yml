@@ -1,0 +1,5 @@
+theme: jekyll-theme-minimal
+title: Veterans Claims Assistance Portal
+description: A secure web application for veterans to submit VA claim assistance requests
+baseurl: "/Vets-Claims-Easy"
+url: "https://veterans-helping-veterans.github.io"

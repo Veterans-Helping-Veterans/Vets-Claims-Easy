@@ -1,0 +1,19 @@
+title: Veterans VA Claims Assistance Portal
+description: Secure portal for veterans to submit VA claims assistance requests
+baseurl: "/Vets-Claims-Easy"
+url: "https://veterans-helping-veterans.github.io"
+
+# Build settings
+markdown: kramdown
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - .github/
+
+# GitHub Pages settings
+github: [metadata]

@@ -1,0 +1,22 @@
+{
+  "name": "vets-claims-easy",
+  "version": "1.0.0",
+  "description": "Veterans Claims Assistance Portal",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx http-server . -p 3000",
+    "build": "npm run clean && npm run build:static",
+    "build:static": "mkdir -p dist && cp -r docs/* dist/ && cp -r js dist/js && cp -r css dist/css && cp -r images dist/images",
+    "clean": "rm -rf dist",
+    "setup": "node scripts/setup-supabase.js",
+    "migrate": "node scripts/supabase-migration.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.8",
+    "crypto-js": "^4.2.0",
+    "dotenv": "^16.5.0"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
