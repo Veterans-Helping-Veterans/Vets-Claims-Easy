@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct Firebase Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            min-height: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Direct Firebase Test</h1>
+    <p>This page tests Firebase connection directly without using the firebase-config.js file.</p>
+    
+    <div class="test-section">
+        <h2>1. Firebase Configuration</h2>
+        <button id="configBtn">Show Firebase Config</button>
+        <div id="configResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Database Connection Test</h2>
+        <button id="dbTestBtn">Test Database Connection</button>
+        <div id="dbResult" class="result"></div>
+    </div>
+    
+    <script type="module">
+        import { getFirebaseConfig, testDatabaseConnection } from './js/firebase-config-test.js';
+        
+        // Config Test
+        document.getElementById('configBtn').addEventListener('click', function() {
+            try {
+                const config = getFirebaseConfig();
+                document.getElementById('configResult').innerHTML = 
+                    '<span class="success">Firebase configuration loaded successfully!</span>' +
+                    '<pre>' + JSON.stringify(config, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('configResult').innerHTML = 
+                    '<span class="error">Failed to load Firebase configuration: ' + error.message + '</span>';
+            }
+        });
+        
+        // Database Test
+        document.getElementById('dbTestBtn').addEventListener('click', async function() {
+            const resultElement = document.getElementById('dbResult');
+            resultElement.innerHTML = 'Testing database connection...';
+            
+            try {
+                const result = await testDatabaseConnection();
+                
+                if (result.success) {
+                    resultElement.innerHTML = 
+                        '<span class="success">Database connection successful!</span>' +
+                        '<pre>' + JSON.stringify(result.data, null, 2) + '</pre>';
+                } else {
+                    resultElement.innerHTML = 
+                        '<span class="error">Database connection failed: ' + result.error + '</span>';
+                    if (result.stack) {
+                        resultElement.innerHTML += '<pre>' + result.stack + '</pre>';
+                    }
+                }
+            } catch (error) {
+                resultElement.innerHTML = 
+                    '<span class="error">Test failed: ' + error.message + '</span>';
+            }
+        });
+    </script>
+</body>
+</html>

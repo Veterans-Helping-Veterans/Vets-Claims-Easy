@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://*.firebaseio.com https://firebasestorage.googleapis.com https://*.googleapis.com https://identitytoolkit.googleapis.com;">
+    <title>Firebase Connection Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .test-result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f0f0f0;
+        }
+        .success {
+            background-color: #d1fae5;
+            border-left: 4px solid #10b981;
+        }
+        .error {
+            background-color: #fee2e2;
+            border-left: 4px solid #ef4444;
+        }
+        .warning {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+        }
+        .code-block {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+        button {
+            background-color: #4a5568;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #2d3748;
+        }
+        .green-button {
+            background-color: #10b981;
+        }
+        .green-button:hover {
+            background-color: #059669;
+        }
+        .red-button {
+            background-color: #ef4444;
+        }
+        .red-button:hover {
+            background-color: #dc2626;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl font-bold mb-6">Firebase Connection Test</h1>
+        
+        <div class="test-card">
+            <h2 class="text-xl font-bold mb-3">1. Firebase SDK Initialization</h2>
+            <p class="mb-3">Testing if Firebase SDK can be initialized correctly.</p>
+            <button id="testInitButton" class="green-button">Run Test</button>
+            <div id="initResult" class="test-result hidden"></div>
+        </div>
+        
+        <div class="test-card">
+            <h2 class="text-xl font-bold mb-3">2. Realtime Database Connection</h2>
+            <p class="mb-3">Testing connection to Firebase Realtime Database.</p>
+            <button id="testDatabaseButton" class="green-button">Run Test</button>
+            <div id="databaseResult" class="test-result hidden"></div>
+        </div>
+        
+        <div class="test-card">
+            <h2 class="text-xl font-bold mb-3">3. Firebase Storage Connection</h2>
+            <p class="mb-3">Testing connection to Firebase Storage.</p>
+            <button id="testStorageButton" class="green-button">Run Test</button>
+            <div id="storageResult" class="test-result hidden"></div>
+        </div>
+        
+        <div class="test-card">
+            <h2 class="text-xl font-bold mb-3">4. Firebase Authentication</h2>
+            <p class="mb-3">Testing Firebase Authentication (anonymous sign-in).</p>
+            <button id="testAuthButton" class="green-button">Run Test</button>
+            <div id="authResult" class="test-result hidden"></div>
+        </div>
+        
+        <div class="test-card">
+            <h2 class="text-xl font-bold mb-3">5. Run All Tests</h2>
+            <p class="mb-3">Run all tests in sequence.</p>
+            <button id="runAllButton" class="green-button">Run All Tests</button>
+        </div>
+        
+        <div class="test-card">
+            <h2 class="text-xl font-bold mb-3">Firebase Configuration</h2>
+            <p class="mb-3">Current Firebase configuration (API keys redacted for security):</p>
+            <div id="configDisplay" class="code-block"></div>
+        </div>
+    </div>
+    
+    <!-- Firebase Scripts -->
+    <script type="module">
+        import { 
+            app, 
+            auth, 
+            database, 
+            storage, 
+            ref, 
+            set, 
+            get, 
+            child,
+            signInAnonymously,
+            storageRef,
+            uploadString,
+            getDownloadURL
+        } from './js/firebase-config.js';
+        
+        // Display Firebase config (with sensitive info redacted)
+        document.addEventListener('DOMContentLoaded', function() {
+            const firebaseConfig = {
+                apiKey: "***REDACTED***",
+                authDomain: app.options.authDomain,
+                projectId: app.options.projectId,
+                storageBucket: app.options.storageBucket,
+                messagingSenderId: "***REDACTED***",
+                appId: "***REDACTED***",
+                databaseURL: app.options.databaseURL
+            };
+            
+            document.getElementById('configDisplay').textContent = JSON.stringify(firebaseConfig, null, 2);
+        });
+        
+        // Test 1: Firebase SDK Initialization
+        document.getElementById('testInitButton').addEventListener('click', function() {
+            const resultElement = document.getElementById('initResult');
+            resultElement.classList.remove('hidden', 'success', 'error');
+            resultElement.innerHTML = '<p>Testing Firebase initialization...</p>';
+            
+            try {
+                if (app && app.name && app.options) {
+                    resultElement.classList.add('success');
+                    resultElement.innerHTML = `
+                        <p>✅ Firebase SDK initialized successfully!</p>
+                        <p>App name: ${app.name}</p>
+                        <p>Project ID: ${app.options.projectId}</p>
+                    `;
+                } else {
+                    resultElement.classList.add('error');
+                    resultElement.innerHTML = `
+                        <p>❌ Firebase SDK initialization issue.</p>
+                        <p>Firebase app object exists but may be incomplete.</p>
+                    `;
+                }
+            } catch (error) {
+                resultElement.classList.add('error');
+                resultElement.innerHTML = `
+                    <p>❌ Firebase SDK initialization failed!</p>
+                    <p>Error: ${error.message}</p>
+                `;
+            }
+        });
+        
+        // Test 2: Realtime Database Connection
+        document.getElementById('testDatabaseButton').addEventListener('click', async function() {
+            const resultElement = document.getElementById('databaseResult');
+            resultElement.classList.remove('hidden', 'success', 'error', 'warning');
+            resultElement.innerHTML = '<p>Testing database connection...</p>';
+            
+            try {
+                // Write test data
+                const testRef = ref(database, 'test');
+                const testData = {
+                    timestamp: new Date().toISOString(),
+                    message: 'Firebase connection test'
+                };
+                
+                await set(testRef, testData);
+                
+                // Read back the data
+                const snapshot = await get(child(ref(database), 'test'));
+                
+                if (snapshot.exists()) {
+                    resultElement.classList.add('success');
+                    resultElement.innerHTML = `
+                        <p>✅ Database connection successful!</p>
+                        <p>Data written and read successfully.</p>
+                        <div class="code-block">
+                            <pre>${JSON.stringify(snapshot.val(), null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultElement.classList.add('warning');
+                    resultElement.innerHTML = `
+                        <p>⚠️ Database write successful, but no data returned on read.</p>
+                        <p>This might be due to database security rules.</p>
+                    `;
+                }
+            } catch (error) {
+                resultElement.classList.add('error');
+                resultElement.innerHTML = `
+                    <p>❌ Database connection failed!</p>
+                    <p>Error: ${error.message}</p>
+                    <p>This might be due to:</p>
+                    <ul class="list-disc ml-5 mt-2">
+                        <li>Incorrect database URL</li>
+                        <li>Database security rules preventing read/write</li>
+                        <li>Network connectivity issues</li>
+                    </ul>
+                `;
+            }
+        });
+        
+        // Test 3: Storage Connection
+        document.getElementById('testStorageButton').addEventListener('click', async function() {
+            const resultElement = document.getElementById('storageResult');
+            resultElement.classList.remove('hidden', 'success', 'error', 'warning');
+            resultElement.innerHTML = '<p>Testing storage connection...</p>';
+            
+            try {
+                // Create a test file in storage
+                const testFileRef = storageRef(storage, 'test/test-file.txt');
+                const testContent = 'This is a test file created at ' + new Date().toISOString();
+                
+                // Upload the string
+                await uploadString(testFileRef, testContent);
+                
+                // Get the download URL
+                const downloadURL = await getDownloadURL(testFileRef);
+                
+                resultElement.classList.add('success');
+                resultElement.innerHTML = `
+                    <p>✅ Storage connection successful!</p>
+                    <p>Test file uploaded successfully.</p>
+                    <p>File path: test/test-file.txt</p>
+                    <p>Download URL: <a href="${downloadURL}" target="_blank" class="text-blue-600 underline">${downloadURL}</a></p>
+                `;
+            } catch (error) {
+                resultElement.classList.add('error');
+                resultElement.innerHTML = `
+                    <p>❌ Storage connection failed!</p>
+                    <p>Error: ${error.message}</p>
+                    <p>This might be due to:</p>
+                    <ul class="list-disc ml-5 mt-2">
+                        <li>Incorrect storage bucket</li>
+                        <li>Storage security rules preventing uploads</li>
+                        <li>Network connectivity issues</li>
+                    </ul>
+                `;
+            }
+        });
+        
+        // Test 4: Authentication
+        document.getElementById('testAuthButton').addEventListener('click', async function() {
+            const resultElement = document.getElementById('authResult');
+            resultElement.classList.remove('hidden', 'success', 'error');
+            resultElement.innerHTML = '<p>Testing authentication...</p>';
+            
+            try {
+                // Sign in anonymously
+                const userCredential = await signInAnonymously(auth);
+                const user = userCredential.user;
+                
+                resultElement.classList.add('success');
+                resultElement.innerHTML = `
+                    <p>✅ Authentication successful!</p>
+                    <p>Signed in anonymously.</p>
+                    <p>User ID: ${user.uid}</p>
+                    <button id="signOutButton" class="red-button mt-3">Sign Out</button>
+                `;
+                
+                // Add sign out functionality
+                document.getElementById('signOutButton').addEventListener('click', async function() {
+                    try {
+                        await auth.signOut();
+                        resultElement.innerHTML = `
+                            <p>✅ Signed out successfully!</p>
+                        `;
+                    } catch (error) {
+                        resultElement.innerHTML += `
+                            <p>❌ Sign out failed: ${error.message}</p>
+                        `;
+                    }
+                });
+            } catch (error) {
+                resultElement.classList.add('error');
+                resultElement.innerHTML = `
+                    <p>❌ Authentication failed!</p>
+                    <p>Error: ${error.message}</p>
+                    <p>This might be due to:</p>
+                    <ul class="list-disc ml-5 mt-2">
+                        <li>Anonymous authentication not enabled in Firebase console</li>
+                        <li>Incorrect API key</li>
+                        <li>Network connectivity issues</li>
+                    </ul>
+                `;
+            }
+        });
+        
+        // Run All Tests
+        document.getElementById('runAllButton').addEventListener('click', function() {
+            document.getElementById('testInitButton').click();
+            
+            setTimeout(() => {
+                document.getElementById('testDatabaseButton').click();
+                
+                setTimeout(() => {
+                    document.getElementById('testStorageButton').click();
+                    
+                    setTimeout(() => {
+                        document.getElementById('testAuthButton').click();
+                    }, 1000);
+                }, 1000);
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
