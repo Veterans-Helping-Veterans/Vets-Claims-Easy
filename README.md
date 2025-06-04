@@ -13,19 +13,20 @@ A secure web application for veterans to submit VA claim assistance requests, wi
 
 ## Technology Stack
 
-- **Frontend**: HTML, JavaScript, and Tailwind CSS
-- **Backend**: Supabase (Database, Authentication, Storage)
-- **Authentication**: Supabase Auth
-- **Storage**: Supabase Storage for file uploads
+- **Frontend**: Jekyll static site generator with HTML, CSS, and JavaScript
+- **Styling**: Modern CSS with military-professional design system
+- **Authentication**: Local Authentication system
+- **Storage**: Browser Local Storage with encryption
 - **Security**: CryptoJS for client-side encryption
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js (v16 or later)
+- Ruby (v2.7 or later)
+- Bundler gem (`gem install bundler`)
+- Node.js (v16 or later) - for additional tooling
 - npm (included with Node.js)
-- A Supabase account (free tier is sufficient)
 
 ### Local Development Setup
 
@@ -35,63 +36,79 @@ A secure web application for veterans to submit VA claim assistance requests, wi
    cd vets-claims-easy
    ```
 
-2. Install dependencies:
+2. Install Jekyll dependencies:
+   ```bash
+   bundle install
+   ```
+
+3. Install Node.js dependencies:
    ```bash
    npm install
    ```
 
-3. Create a Supabase project at https://supabase.com
-
-4. Create a `.env` file in the root directory with your Supabase credentials:
-   ```
-   SUPABASE_URL=your_supabase_project_url
-   SUPABASE_ANON_KEY=your_supabase_anon_key
-   ENCRYPTION_KEY=your_secure_encryption_key
-   ```
-
-5. Run the database migration:
+4. Start the development server:
    ```bash
-   npm run migrate
-   ```
-
-6. Start the development server:
-   ```bash
+   # Quick start (Node.js HTTP server):
    npm start
+
+   # OR try Jekyll with fallback:
+   ./dev-server.sh
+
+   # OR manually with Jekyll:
+   bundle exec jekyll serve --livereload --port 4000
    ```
 
-7. Open http://localhost:3000 in your browser
+5. Open the server URL in your browser:
+   - Node.js server: http://localhost:3000
+   - Jekyll server: http://localhost:4000
 
-### Supabase Setup Instructions
+## Project Structure
 
-1. Create a new project in Supabase
-2. Go to Project Settings > API to get your project URL and anon key
-3. Run the migration script to set up the database schema:
-   ```bash
-   npm run migrate
-   ```
-4. Enable Email Auth in Authentication > Providers
-5. Create your first admin user in the SQL Editor:
-   ```sql
-   insert into auth.users (email, role)
-   values ('your-email@example.com', 'admin');
-   ```
+```
+├── _config.yml          # Jekyll configuration
+├── _data/               # Site data files
+├── _guides/             # Veterans guides and resources
+├── _includes/           # Reusable HTML components
+├── _layouts/            # Page templates
+├── _pages/              # Static pages
+├── _posts/              # Blog posts and articles
+├── _resources/          # Resource documents
+├── assets/              # CSS, JS, and images
+│   ├── css/            # Stylesheets
+│   ├── js/             # JavaScript files
+│   └── images/         # Images and icons
+├── about/              # About pages
+├── blog/               # Blog section
+├── guides/             # User guides
+├── resources/          # Resource pages
+├── support/            # Support pages
+├── tools/              # Interactive tools
+└── *.md                # Individual pages
+```
 
 ## Security Features
 
 - Client-side encryption of sensitive veteran data
-- Row Level Security (RLS) policies in Supabase
-- Secure file storage with access controls
+- Secure local storage with access controls
 - Role-based access control for admin features
 
 ## Production Deployment
 
-1. Create a production Supabase project
-2. Set up your production environment variables
-3. Build the project:
+1. Build the Jekyll site:
    ```bash
+   bundle exec jekyll build
+   # OR using npm script:
    npm run build
    ```
-4. Deploy the contents of the `dist` folder to your web hosting provider
+
+2. Deploy the contents of the `_site` folder to your web hosting provider
+
+### Available Scripts
+
+- `npm run dev` - Start Jekyll development server with live reload
+- `npm run build` - Build the site for production
+- `npm run clean` - Clean build artifacts
+- `npm start` - Start simple HTTP server for testing
 
 ## Contributing
 
@@ -100,3 +117,4 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+# vetswebsite
